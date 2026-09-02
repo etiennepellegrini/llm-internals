@@ -9,64 +9,31 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#E7EBE7;
-  --card:#F3F6F2;
-  --ink:#16232A;
-  --soft:#4A5A61;
-  --faint:#7C8A8E;
-  --rule:#A9B6B2;
-  --rule-2:#C9D2CE;
-  --q:#1C6A87;
-  --k:#A34E19;
-  --v:#5A4789;
-  --hit:#2C7A57;
-  --warn:#9E2B45;
+  --paper:#E7EBE7; --card:#F3F6F2; --ink:#16232A; --soft:#4A5A61; --faint:#7C8A8E;
+  --rule:#A9B6B2; --rule-2:#C9D2CE;
+  --q:#1C6A87; --k:#A34E19; --v:#5A4789; --hit:#2C7A57; --warn:#9E2B45;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{
-  margin:0; background:var(--paper); color:var(--ink);
-  font-family:Spectral,"Iowan Old Style",Georgia,serif;
-  font-size:17px; line-height:1.62;
-}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Spectral,"Iowan Old Style",Georgia,serif;font-size:17px;line-height:1.62}
 .wrap{max-width:820px;margin:0 auto;padding:0 20px 120px}
 a{color:var(--q);text-decoration:none;border-bottom:1px solid var(--rule)}
 a:hover{border-bottom-color:var(--q)}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--q);outline-offset:2px}
-
-/* --- top bar --- */
-.bar{
-  border-bottom:1px solid var(--rule); background:var(--card);
-  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12.5px;
-}
+.bar{border-bottom:1px solid var(--rule);background:var(--card);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
 .bar .inner{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;gap:18px;flex-wrap:wrap;align-items:baseline}
 .bar a{border:0;color:var(--soft)}
 .bar a[aria-current]{color:var(--ink);font-weight:600}
 .bar a:hover{color:var(--q)}
 .bar .who{margin-left:auto;color:var(--faint)}
-
-/* --- title --- */
 header.title{padding:56px 0 8px}
-header.title h1{
-  font-size:clamp(30px,6.2vw,46px); line-height:1.08; margin:0 0 14px;
-  font-weight:600; letter-spacing:-.015em;
-}
+header.title h1{font-size:clamp(30px,6.2vw,46px);line-height:1.08;margin:0 0 14px;font-weight:600;letter-spacing:-.015em}
 header.title p.stand{font-size:19px;color:var(--soft);margin:0;max-width:60ch}
-
-/* --- banner headings (echoing the section separators in a Fortran/Python header) --- */
 .bannerwrap{container-type:inline-size;margin:64px 0 22px}
-h2 .art{
-  display:block; font-family:"IBM Plex Mono",ui-monospace,monospace;
-  font-size:clamp(6px,2.24cqw,15px); line-height:1.35; color:var(--rule);
-  white-space:pre; margin:0; font-weight:400;
-}
-h2 .art b{color:var(--ink);font-weight:600}
-h2{margin:0;font-weight:400}
-h3{
-  font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:600;
-  font-size:14.5px; letter-spacing:.01em; color:var(--ink);
-  margin:40px 0 10px;
-}
+.bannerwrap h2 .art{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:clamp(6px,2.24cqw,15px);line-height:1.35;color:var(--rule);white-space:pre;margin:0;font-weight:400}
+.bannerwrap h2 .art b{color:var(--ink);font-weight:600}
+.bannerwrap h2{margin:0;font-weight:400}
+h3{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-size:14.5px;color:var(--ink);margin:40px 0 10px}
 h3::before{content:"# ===== ";color:var(--rule-2);font-weight:400}
 h4{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:600;margin:26px 0 8px}
 h4::before{content:"# --- ";color:var(--rule-2);font-weight:400}
@@ -77,59 +44,59 @@ code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.87em;backgrou
 pre{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;line-height:1.55;background:var(--card);border:1px solid var(--rule-2);padding:14px 16px;overflow-x:auto}
 pre code{background:none;border:0;padding:0;font-size:inherit}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-
-/* --- figures --- */
 figure{margin:26px 0;background:var(--card);border:1px solid var(--rule-2);padding:18px}
 figcaption{font-size:14px;color:var(--soft);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule-2);max-width:70ch}
 .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
 .note{border-left:3px solid var(--rule);padding:2px 0 2px 16px;color:var(--soft);font-size:16px;margin:22px 0}
 .note strong{color:var(--ink)}
-
-/* --- controls --- */
-button.tok, .chip{
-  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;
-  border:1px solid var(--rule);background:#fff;color:var(--ink);
-  padding:5px 9px;cursor:pointer;border-radius:2px;
-}
+.tldr{border:1px solid var(--ink);background:#fff;padding:20px 24px 8px;margin:36px 0}
+.tldr .hd{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;font-weight:600;color:var(--soft);margin-bottom:12px}
+.tldr ol{margin:0;padding-left:20px;max-width:64ch}
+.tldr li{margin-bottom:10px}
+dfn{font-style:normal;font-weight:600;border-bottom:2px solid var(--rule-2)}
+button.tok,.chip{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;border:1px solid var(--rule);background:#fff;color:var(--ink);padding:5px 9px;cursor:pointer;border-radius:2px}
 button.tok[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
-button.tok:disabled{opacity:.32;cursor:not-allowed}
-.btn{
-  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;
-  border:1px solid var(--ink);background:var(--ink);color:var(--card);
-  padding:7px 14px;cursor:pointer;border-radius:2px
-}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;border:1px solid var(--ink);background:var(--ink);color:var(--card);padding:7px 14px;cursor:pointer;border-radius:2px}
 .btn.ghost{background:transparent;color:var(--ink)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
 label.sl{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--soft);margin-bottom:4px}
 input[type=range]{width:100%;accent-color:var(--q)}
 table{border-collapse:collapse;width:100%;font-size:14px;font-family:"IBM Plex Mono",ui-monospace,monospace}
-th,td{text-align:left;padding:6px 10px 6px 0;border-bottom:1px solid var(--rule-2)}
+th,td{text-align:left;padding:7px 12px 7px 0;border-bottom:1px solid var(--rule-2);vertical-align:top}
 th{color:var(--soft);font-weight:500}
-td.num{text-align:right;font-variant-numeric:tabular-nums}
-
-/* attention bars */
+.tblscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:18px}
+@media(max-width:660px){table{font-size:12.5px;min-width:430px}}
 .abar{height:12px;background:var(--q);transition:width .28s ease}
 .arow{display:grid;grid-template-columns:minmax(64px,86px) 1fr 54px;gap:10px;align-items:center;margin-bottom:6px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
 .arow .lbl{text-align:right;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .arow .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--soft)}
 .arow.masked{opacity:.3}
 .track{background:var(--rule-2);height:12px}
-
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 @media(max-width:620px){.grid2{grid-template-columns:1fr}}
 .heat{display:grid;gap:2px}
 .cell{aspect-ratio:1;border-radius:1px}
 .headcap{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;color:var(--soft);margin-bottom:6px}
-
 .steps{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px}
 .steps .st{padding:9px 0;border-bottom:1px solid var(--rule-2);opacity:.32;transition:opacity .2s}
 .steps .st.on{opacity:1}
-.steps .st .k{color:var(--faint);display:inline-block;min-width:158px;padding-right:12px}
+.steps .st .k{color:var(--faint);display:inline-block;min-width:170px;padding-right:12px}
 svg{max-width:100%;height:auto;display:block}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .readmore{background:var(--card);border:1px solid var(--rule);padding:18px 20px;margin:34px 0}
 .readmore h4{margin-top:0}
 .readmore ul{margin-bottom:0}
+.emtbl{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;border:1px solid var(--rule-2);background:#fff;overflow-x:auto}
+.emrow{display:flex;border-bottom:1px solid #EEF2EE;white-space:nowrap}
+.emrow:last-child{border-bottom:0}
+.emrow .idx{min-width:118px;padding:5px 8px;color:var(--faint);border-right:1px solid #EEF2EE;position:sticky;left:0;background:#fff}
+.emrow .cellv{min-width:52px;padding:5px 6px;text-align:right;color:var(--soft);font-variant-numeric:tabular-nums}
+.emrow.on{background:rgba(28,106,135,.10)}
+.emrow.on .idx{color:var(--q);font-weight:600;background:#EAF1F4}
+.emrow.on .cellv{color:var(--ink)}
+.vecline{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;white-space:nowrap;overflow-x:auto;padding:5px 0;display:flex;align-items:center}
+.vecline .tag{min-width:158px;color:var(--faint);position:sticky;left:0;background:var(--card);padding-right:10px}
+.vecline .n{min-width:56px;text-align:right;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -138,62 +105,197 @@ svg{max-width:100%;height:auto;display:block}
   <a href="transformers.html" aria-current="page">transformers</a>
   <a href="llms.html">llms</a>
   <a href="cache.html">cache</a>
-  <span class="who">3 of 3 · read in any order</span>
+  <span class="who">1 of 3 &#183; start here</span>
 </div></nav>
 
 <div class="wrap">
 
 <header class="title">
   <h1>How a transformer works</h1>
-  <p class="stand">The architecture underneath every current language model. This is the conceptual scaffold — read it, then go play with a live one.</p>
+  <p class="stand">The architecture underneath every current language model, built one piece at a time. Assumes linear algebra; assumes no machine learning.</p>
 </header>
 
-<p>A transformer is a function. It takes a sequence of tokens and returns a probability distribution over what token comes next. Everything else — chat, code generation, tool use, the appearance of reasoning — is that one function called repeatedly.</p>
+<div class="tldr">
+  <div class="hd">TL;DR</div>
+  <ol>
+    <li>A transformer is <strong>one function</strong>: text in, a probability for every possible next chunk of text out. Everything else is that function called repeatedly.</li>
+    <li>Text is cut into <strong>tokens</strong> (word-ish chunks). Each token is just an integer &#8212; a row number, carrying no meaning of its own.</li>
+    <li>That row number indexes a big table of learned numbers, giving each token a <strong>vector</strong>. Words used similarly end up with similar vectors, so meaning becomes something you can do arithmetic on.</li>
+    <li>A token's vector starts out context-free: <em>bank</em> gets the identical vector in "river bank" and "savings bank". The rest of the model exists to fix that.</li>
+    <li><strong>Attention</strong> is the fix. Each token asks a question, every other token advertises what it offers, and the token pulls in a weighted blend of whatever matched.</li>
+    <li>Attention plus a per-token transformation makes one <strong>layer</strong>. Stack about a hundred, read the final vector, convert to probabilities, pick a token, append it, run the whole thing again.</li>
+  </ol>
+</div>
 
-<p>What makes it work is a single idea: <strong>every token gets to look at every earlier token and pull in whatever it needs.</strong> Prior architectures passed information along a chain, one step at a time, which meant long-range dependencies had to survive a long relay. Attention lets any position read from any earlier position directly, in one hop, and it does all positions in parallel. That parallelism is why these models could be scaled to the size they are.</p>
+<p>Every term below that isn't standard mathematics gets defined where it first appears, and no mechanism shows up before the problem it exists to solve. There's a <a href="#glossary">glossary</a> at the end.</p>
 
 <div class="bannerwrap"><h2>
-<span class="sr">Tokens</span>
+<span class="sr">What the function does</span>
 <span class="art" aria-hidden="true"></span></h2></div>
 
-<p>Text is chopped into <em>tokens</em> — sub-word chunks learned from a corpus by a merge algorithm (byte-pair encoding). Common words are single tokens; rare words fragment. A leading space is usually part of the token, which is why <code> the</code> and <code>the</code> are different entries.</p>
+<p>Before any internals, be precise about input and output, because it's narrower than it looks from outside.</p>
+
+<p>You hand the model a sequence of text. It returns <strong>one probability distribution over its entire vocabulary</strong> — a number for each of roughly 100,000 possible chunks of text, giving the likelihood that each one comes next. That is the whole output. A single list of probabilities.</p>
+
+<pre><code>input:   "The probe reached "
+
+output:  Jupiter   0.31
+         Saturn    0.22
+         Earth     0.14
+         the       0.09
+         ...  100,000 entries in total, summing to 1.0</code></pre>
+
+<p>Something <em>outside</em> the model then picks one entry, appends it to the text, and calls the function again on the longer string. Predict, append, repeat. That loop is where sentences come from. The model itself never produces a sentence — it produces one distribution, with no notion that it is about to be called again.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Step 1 &#183; text becomes integers</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>The model can only do arithmetic, so text has to become numbers. First it's cut into pieces called <dfn>tokens</dfn>.</p>
+
+<p>Tokens are not characters and not quite words. They're chunks chosen by a compression procedure run over a large body of text before training starts: begin with individual characters, repeatedly find the most frequent adjacent pair and merge it into a new unit, stop after about 100,000 units. Common words survive whole; rare ones get split. A leading space is usually glued to the front, which is why <code>&#183;the</code> and <code>the</code> are two distinct entries.</p>
+
+<p>The output is a fixed list — the <dfn>vocabulary</dfn> — and each token is identified by <strong>its position in that list</strong>. Nothing more than that.</p>
 
 <figure>
   <div class="row">
     <input id="tokIn" value="The probe reached Jupiter in 2016." style="flex:1;min-width:220px;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:7px 9px;border:1px solid var(--rule);border-radius:2px;background:#fff">
   </div>
   <div id="tokOut" class="row" style="margin-bottom:0"></div>
-  <figcaption>An <em>approximation</em> of tokenization — real tokenizers use learned BPE merge tables, not the heuristic here. The point to take away is the granularity: not characters, not words. This is also why models are bad at counting letters in a word. They never see the letters.</figcaption>
+  <figcaption>An approximation &#8212; the real merge table is learned rather than the heuristic used here &#8212; but the granularity is right. Note the consequence: the model never sees the letters inside a token, which is why counting the r's in "strawberry" is genuinely hard for it.</figcaption>
 </figure>
 
-<p>Each token ID indexes into an embedding table, producing a vector — a list of a few thousand numbers. That vector is the token's starting representation. Position information gets folded in too, because attention itself is order-blind: without it, "Jupiter orbits the probe" and "The probe orbits Jupiter" would be identical inputs.</p>
+<div class="note"><strong>The ID number carries no meaning whatsoever.</strong> If <code>The</code> is token 84049, that 84049 is a row number &#8212; exactly like an index into a Fortran array. Token 84050 is not "one greater" in any meaningful sense; it's just whatever landed in the next slot. Shuffle the entire vocabulary, retrain, and nothing changes. The integer is therefore useless on its own, which is what the next step is for.</div>
 
 <div class="bannerwrap"><h2>
-<span class="sr">Attention</span>
+<span class="sr">Step 2 &#183; integers become vectors</span>
 <span class="art" aria-hidden="true"></span></h2></div>
 
-<p>This is the mechanism. Each token produces three vectors by multiplying its representation by three learned weight matrices:</p>
+<p>The model holds a large matrix called the <dfn>embedding table</dfn>: one row per vocabulary entry, each row a few thousand numbers wide. GPT-2 small used 50,257 &#215; 768. A frontier model is closer to 100,000 &#215; 5,000 — tens of millions of numbers, every one of them learned during training.</p>
+
+<p>Turning a token ID into a vector is then the simplest operation in the entire model: <strong>read that row.</strong> Token 84049 means "fetch row 84049 of the table". It's a lookup, not a computation. The vector you get back is the token's <dfn>embedding</dfn>.</p>
+
+<p>Why go to the trouble? Two reasons:</p>
 
 <ul>
-  <li><strong style="color:var(--q)">Query</strong> — what this token is looking for.</li>
-  <li><strong style="color:var(--k)">Key</strong> — what this token offers to others.</li>
-  <li><strong style="color:var(--v)">Value</strong> — what this token actually hands over if selected.</li>
+  <li><strong>Vectors support arithmetic.</strong> You can add them, scale them, project them, take dot products. None of that means anything on an arbitrary index.</li>
+  <li><strong>Distance can encode similarity.</strong> Training pushes tokens that get used in similar contexts toward similar directions. Nobody programs this — it falls out of the optimisation, because the model does better when it can generalise across related words. Once it has happened, <code>&#183;Jupiter</code> and <code>&#183;Saturn</code> end up near each other, and the angle between two vectors becomes a usable measure of relatedness.</li>
 </ul>
 
-<p>The database analogy is close enough to be useful and wrong enough to flag: it is a <em>soft</em> lookup. You don't retrieve one row. You take a weighted blend of every row, where the weights come from how well each key matches your query.</p>
+<p>The embedding table begins as random noise. Everything meaningful in it is a residue of training.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Step 3 &#183; adding position</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>There's a problem with what we have, and it's clearest if you look one step ahead: the mixing operation coming in step 5 treats its inputs as an unordered <em>set</em>. Give it "Jupiter orbits the probe" or "The probe orbits Jupiter" and, with embeddings alone, it computes identical results. Word order would be invisible to it.</p>
+
+<p>So position has to be pushed into the vectors themselves. The original scheme — still the easiest to look at — builds a <dfn>positional encoding</dfn> vector for each slot out of sines and cosines at geometrically spaced frequencies, and simply <strong>adds</strong> it:</p>
+
+<pre><code>vector at position p  =  embedding[token_id]  +  position_vector[p]</code></pre>
+
+<p>Adding sounds destructive — surely the two signals scramble together? In a space of several thousand dimensions there's room for both to coexist and for later operations to pull them apart again. Different frequencies occupy different dimensions, so "which token" and "which slot" don't compete for the same coordinates.</p>
+
+<figure>
+  <div class="row" style="margin-bottom:10px">
+    <span class="mono" style="font-size:12.5px;color:var(--soft)">click a token:</span>
+    <span id="embToks" class="row" style="margin:0;gap:6px"></span>
+  </div>
+
+  <div class="mono" style="font-size:12.5px;color:var(--soft);margin:16px 0 6px">
+    the embedding table &#8212; 6 of ~100,000 rows, 10 of ~5,000 columns
+  </div>
+  <div class="emtbl" id="embTable"></div>
+
+  <div class="mono" style="font-size:12.5px;color:var(--soft);margin:20px 0 6px">
+    what actually enters layer 1
+  </div>
+  <div id="embMath"></div>
+
+  <figcaption>Table values here are illustrative random numbers &#8212; real learned ones aren't interpretable by eye anyway. The <em>position</em> row, though, is really computed: it's the sinusoidal encoding from the 2017 paper, sin(p/10000<sup>2i/d</sup>) on even dimensions and cos on odd. Clicking a different token changes the top row; its slot changes the middle row; the two vary independently. Most current models use a variant called rotary encoding that rotates vectors inside the attention step rather than adding at the input, but the purpose is the same.</figcaption>
+</figure>
+
+<p>Every token now has one vector encoding <em>what it is</em> and <em>where it is</em>. That's the input to the model proper.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Step 4 &#183; the problem to be solved</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Here's the limitation of everything so far, and it motivates the entire rest of the architecture.</p>
+
+<p>An embedding is <strong>context-free</strong>. The row for <code>&#183;bank</code> is one fixed set of numbers. It is the same vector in "the river bank was steep" as in "the bank approved the loan". Those are different meanings, and any useful model has to end up representing them differently.</p>
+
+<p>The same goes for anything involving reference. In "the probe reached it in 2016", the vector for <code>&#183;it</code> starts as the generic <code>&#183;it</code> row, carrying nothing about what it points to.</p>
+
+<p>So each token's vector needs to be <strong>updated using information from the other tokens present</strong>. Which raises exactly two questions:</p>
+
+<ol>
+  <li><strong>Which other tokens should it draw from?</strong> For <code>&#183;bank</code>, the answer had better be <code>&#183;river</code> or <code>&#183;loan</code>, not <code>&#183;the</code>.</li>
+  <li><strong>What should it take from them?</strong> Having decided <code>&#183;river</code> is relevant, what exactly gets copied across?</li>
+</ol>
+
+<p>The mechanism that answers both is called <dfn>attention</dfn>. That is all the word means: a procedure letting each token gather information from the others, with learned control over which ones and what.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Step 5 &#183; how attention answers them</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Start somewhere familiar. In a dictionary or hash table, a lookup works like this:</p>
+
+<pre><code>d = {"river": 0.9, "loan": 0.4, "the": 0.1}
+d["river"]   &#8594;   0.9</code></pre>
+
+<p>There are three roles in play. You supply <strong>a search term</strong>. It gets compared against <strong>the stored labels</strong>. Exactly one matches, and you get back <strong>the contents filed under it</strong>. Matching is all-or-nothing: one hit, everything else contributes zero.</p>
+
+<p>Attention keeps the three roles and abandons the all-or-nothing part. Every token produces all three:</p>
+
+<ul>
+  <li>a search term, called its <dfn style="color:var(--q)">query</dfn> — "what am I looking for?"</li>
+  <li>a label, called its <dfn style="color:var(--k)">key</dfn> — "what do I advertise about myself?"</li>
+  <li>contents, called its <dfn style="color:var(--v)">value</dfn> — "what do I hand over if chosen?"</li>
+</ul>
+
+<p>Then, instead of finding the single matching key: <strong>compare the query against every key</strong>, get a match score for each, convert those scores into weights summing to 1, and return the <strong>weighted average of all the values</strong>. A key that matched well dominates; one that matched poorly contributes nearly nothing; nothing is excluded outright.</p>
+
+<p>That's what makes it a <em>soft</em> lookup — retrieval by blending rather than selection. It also matters that it's a blend: a smooth weighted sum has a useful derivative everywhere, so the whole thing can be trained by gradient descent. A hard lookup, being a branch, does not.</p>
+
+<h3>Where the three vectors come from</h3>
+
+<p>The layer holds three learned matrices, W<sub>Q</sub>, W<sub>K</sub> and W<sub>V</sub>. Each token's input vector gets multiplied by each of them:</p>
+
+<pre><code>query_i = W_Q &#183; x_i     key_i = W_K &#183; x_i     value_i = W_V &#183; x_i</code></pre>
+
+<p>The same three matrices apply to every token — they're properties of the layer, not of any particular word. Three separate matrices are needed because the three roles really are different things. What <code>&#183;bank</code> wants to <em>ask</em> ("is there a water word or a money word near me?") is not what <code>&#183;river</code> wants to <em>advertise</em> ("I am a water word"), and neither is the <em>content</em> <code>&#183;river</code> passes along. A single matrix couldn't produce all three.</p>
+
+<h3>Scoring a match</h3>
+
+<p>The match score between a query and a key is their <strong>dot product</strong> — large and positive when they point the same way, near zero when orthogonal, negative when opposed. Training's job is to shape W<sub>Q</sub> and W<sub>K</sub> so that queries and keys which <em>ought</em> to match come out aligned.</p>
+
+<p>Two adjustments before scores become weights:</p>
+
+<ul>
+  <li><strong>Divide by &#8730;d</strong>, where d is the vector length. Dot products of random vectors grow like &#8730;d, and the next step misbehaves on large inputs. This holds the variance roughly constant regardless of model size.</li>
+  <li><strong>Apply softmax.</strong> <dfn>Softmax</dfn> converts any list of real numbers into positive numbers summing to 1: exponentiate each, divide by the total. Exponentiating forces positivity and exaggerates gaps, so a modest lead in raw score becomes a decisive lead in weight.</li>
+</ul>
+
+<h3>Not looking ahead</h3>
+
+<p>One constraint remains. During training the model predicts the next token at <em>every</em> position of a passage at once — that's what makes training tractable. But a position predicting its own successor must not be allowed to see it. So before softmax, every score pointing at a later position is set to &#8722;&#8734;, which softmax maps to exactly zero weight. This is the <dfn>causal mask</dfn>, and a model built with it is <dfn>autoregressive</dfn>: each position sees only itself and what came before.</p>
+
+<p>Here is the whole operation with numbers you can step through:</p>
 
 <figure>
   <div class="row">
-    <span class="mono" style="font-size:12.5px;color:var(--soft)">query token:</span>
+    <span class="mono" style="font-size:12.5px;color:var(--soft)">token doing the looking:</span>
     <span id="qbtns" class="row" style="margin:0;gap:6px"></span>
   </div>
 
   <div class="steps" id="steps" style="margin:16px 0 18px">
-    <div class="st" data-s="1"><span class="k">1 · score</span><span id="s1"></span></div>
-    <div class="st" data-s="2"><span class="k">2 · scale ÷&#8730;d</span><span id="s2"></span></div>
-    <div class="st" data-s="3"><span class="k">3 · causal mask</span><span id="s3"></span></div>
-    <div class="st" data-s="4"><span class="k">4 · softmax</span><span id="s4"></span></div>
-    <div class="st" data-s="5"><span class="k">5 · blend values</span><span id="s5"></span></div>
+    <div class="st" data-s="1"><span class="k">1 &#183; match scores</span><span id="s1"></span></div>
+    <div class="st" data-s="2"><span class="k">2 &#183; divide by &#8730;d</span><span id="s2"></span></div>
+    <div class="st" data-s="3"><span class="k">3 &#183; mask the future</span><span id="s3"></span></div>
+    <div class="st" data-s="4"><span class="k">4 &#183; softmax to weights</span><span id="s4"></span></div>
+    <div class="st" data-s="5"><span class="k">5 &#183; blend the values</span><span id="s5"></span></div>
   </div>
 
   <div id="abars"></div>
@@ -203,74 +305,88 @@ svg{max-width:100%;height:auto;display:block}
     <button class="btn ghost" id="allBtn">show all</button>
     <button class="btn ghost" id="resetBtn">reset</button>
   </div>
-  <figcaption>Real arithmetic on a toy model: 4 tokens, 4 dimensions, one head. The Q, K and V vectors are hand-picked rather than trained, but every number below them is computed live in your browser. A production model does this with ~5,000 dimensions and ~100 heads per layer, across ~100 layers — the operation is identical, only the shapes change.</figcaption>
+  <figcaption>A toy model: 4 tokens, 4-dimensional vectors, one set of Q/K/V matrices. The vectors are hand-picked rather than trained, but every number derived from them is computed live &#8212; including the mask, which you can watch engage by selecting an earlier token. Step 5's output is the update added to that token's vector. A real layer does exactly this with ~5,000-dimensional vectors over thousands of tokens.</figcaption>
 </figure>
 
-<h3>Why the scaling and the mask are there</h3>
+<h3>Several attentions at once</h3>
 
-<p>The <code>÷&#8730;d</code> step keeps dot products from growing with dimension. In a 5,000-dimensional space raw dot products get large, softmax saturates, and gradients vanish. Dividing by the square root of the dimension holds the variance roughly constant.</p>
+<p>One set of W<sub>Q</sub>/W<sub>K</sub>/W<sub>V</sub> can express only one notion of relevance. Real layers run dozens of independent copies side by side, each with its own three matrices. Each copy is a <dfn>head</dfn>. They operate in parallel on the same input, and their outputs are concatenated and mixed by one further learned matrix.</p>
 
-<p>The <strong>causal mask</strong> sets every score for a future position to negative infinity, so softmax gives it exactly zero weight. Token 3 can see tokens 1–3 and nothing beyond. This is what makes the model autoregressive, and — as it happens — it is the entire reason prompt caching is possible. Hold that thought; it's the subject of the third document.</p>
-
-<h3>Many heads, different jobs</h3>
-
-<p>One attention pattern per layer would be limiting. Real layers run dozens of heads in parallel, each with its own Q/K/V matrices, each free to specialise. Their outputs are concatenated and mixed.</p>
+<p>The point is specialisation: one head can track grammatical subjects while another tracks the immediately preceding token and a third tracks topic.</p>
 
 <figure>
   <div class="grid2" id="heads"></div>
-  <figcaption>Four illustrative head patterns over the same sentence — rows are queries, columns are keys, darker means more attention. The upper triangle is empty because of the causal mask. These specific matrices are hand-drawn, but heads with these characters are genuinely found in trained models: interpretability work has identified previous-token heads, positional heads, and heads that track syntactic dependencies. Most heads are not this legible.</figcaption>
+  <figcaption>Four illustrative heads over one sentence. Each square is a query-key pair: the row is the token doing the looking, the column is the token looked at, darker means more weight. The blank upper-right triangle is the causal mask &#8212; those positions lie in the future. These particular patterns are hand-drawn, but heads answering to these descriptions really are found in trained models by interpretability researchers. Most heads are far less legible than this.</figcaption>
 </figure>
 
 <div class="bannerwrap"><h2>
-<span class="sr">The rest of the block</span>
+<span class="sr">Step 6 &#183; the other half of a layer</span>
 <span class="art" aria-hidden="true"></span></h2></div>
 
-<p>Attention moves information <em>between</em> positions. The other half of each layer — a two-layer feed-forward network, applied to each position independently — does the processing <em>within</em> a position. It's typically 4× wider than the model dimension, and it holds most of the parameters. Current interpretability work suggests much of what we'd loosely call factual knowledge lives here, in patterns of neuron activation, rather than in the attention weights.</p>
+<p>Attention moves information <em>between</em> positions. The second half of each layer does processing <em>within</em> a position: a small two-layer neural network applied to each token's vector separately and identically. It's called the <dfn>feed-forward network</dfn>, or MLP, and mechanically it's two matrix multiplications with a nonlinear function applied elementwise between them:</p>
 
-<p>Both sublayers write into a shared <strong>residual stream</strong>: rather than replacing the representation, each block computes an update and adds it. The stream runs unbroken from embedding to output, and every block reads from it and writes back into it.</p>
+<pre><code>out = W_2 &#183; nonlinear(W_1 &#183; x)</code></pre>
+
+<p>The intermediate result is typically 4&#215; wider than the vector itself, which is why this block holds most of the model's numbers despite being simpler than attention.</p>
+
+<p>The nonlinearity is not decoration, and the reason is worth stating plainly: <strong>a stack of linear maps collapses into a single linear map.</strong> Without something nonlinear between them, a 100-layer model would be algebraically identical to one matrix and could represent nothing that one matrix couldn't. The nonlinearity is the only thing that makes depth mean anything.</p>
+
+<p>Interpretability work suggests much of what we'd loosely call stored knowledge lives in these blocks, as patterns of which intermediate units fire. Attention decides what to look at; the feed-forward network decides what to make of it.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Step 7 &#183; stacking</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Both halves write their results back by <strong>addition</strong> rather than replacement:</p>
+
+<pre><code>x = x + attention(x)
+x = x + feedforward(x)</code></pre>
+
+<p>The running vector being added into is the <dfn>residual stream</dfn> — "residual" because each block computes a correction to what's already there rather than a replacement value. It runs unbroken from embedding to output, and every block both reads from it and writes into it.</p>
 
 <figure>
-<svg viewBox="0 0 640 300" role="img" aria-label="Diagram of the residual stream running vertically with attention and feed-forward blocks adding into it">
-  <defs>
-    <marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-      <path d="M0,0 L6,3 L0,6 z" fill="#4A5A61"/>
-    </marker>
-  </defs>
+<svg viewBox="0 0 640 300" role="img" aria-label="The residual stream running vertically with attention and feed-forward blocks adding into it">
+  <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L6,3 L0,6 z" fill="#4A5A61"/></marker></defs>
   <rect x="292" y="20" width="18" height="260" fill="#C9D2CE"/>
   <text x="322" y="34" font-family="IBM Plex Mono, monospace" font-size="12" fill="#4A5A61">residual stream</text>
-  <text x="322" y="50" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">(carries everything, unchanged unless written to)</text>
-
-  <!-- attention block -->
+  <text x="322" y="50" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">the token's vector, unchanged unless written to</text>
   <rect x="70" y="76" width="170" height="52" fill="#fff" stroke="#1C6A87"/>
-  <text x="86" y="99" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#1C6A87">self-attention</text>
-  <text x="86" y="116" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">moves info across tokens</text>
+  <text x="86" y="99" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#1C6A87">attention</text>
+  <text x="86" y="116" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">gathers across tokens</text>
   <path d="M292,90 L246,90" stroke="#4A5A61" fill="none" marker-end="url(#ar)"/>
   <path d="M240,114 L292,114" stroke="#4A5A61" fill="none" marker-end="url(#ar)"/>
   <circle cx="301" cy="114" r="9" fill="none" stroke="#4A5A61"/>
   <text x="301" y="118" font-family="IBM Plex Mono, monospace" font-size="12" fill="#4A5A61" text-anchor="middle">+</text>
-
-  <!-- mlp block -->
   <rect x="362" y="170" width="190" height="52" fill="#fff" stroke="#5A4789"/>
-  <text x="378" y="193" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#5A4789">feed-forward (MLP)</text>
+  <text x="378" y="193" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#5A4789">feed-forward</text>
   <text x="378" y="210" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">processes each token alone</text>
   <path d="M310,184 L356,184" stroke="#4A5A61" fill="none" marker-end="url(#ar)"/>
   <path d="M362,208 L310,208" stroke="#4A5A61" fill="none" marker-end="url(#ar)"/>
   <circle cx="301" cy="208" r="9" fill="none" stroke="#4A5A61"/>
   <text x="301" y="212" font-family="IBM Plex Mono, monospace" font-size="12" fill="#4A5A61" text-anchor="middle">+</text>
-
-  <text x="20" y="262" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">one layer &#183; repeat ~100&#215;</text>
+  <text x="20" y="262" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">one layer &#183; repeat 40 to 120 times</text>
   <path d="M301,280 L301,296" stroke="#4A5A61" fill="none" marker-end="url(#ar)"/>
 </svg>
-<figcaption>The residual stream is best read as a shared bus, not a pipeline. A block that has nothing to contribute at a given position can write approximately zero and leave the stream alone. This is also why you can sometimes delete a middle layer and the model still mostly works.</figcaption>
+<figcaption>Adding rather than replacing buys two things. Gradients flow straight back down the stream during training instead of being attenuated by a hundred successive multiplications &#8212; the reason very deep networks became trainable at all. And a block with nothing useful to contribute at some position can write approximately zero and leave the stream alone, which is why you can sometimes delete a middle layer and the model still mostly works.</figcaption>
 </figure>
 
-<p>Stack that block 40–120 times and you have the model. Rough intuition for what the depth buys: early layers resolve tokens into words and local syntax, middle layers build the semantic content, late layers narrow toward a specific prediction. That's a simplification, but a serviceable one.</p>
+<p>One piece of housekeeping appears at each block: <dfn>layer normalisation</dfn>, which rescales a vector to zero mean and unit variance before use. It doesn't change what's represented, it just keeps magnitudes in a range where the arithmetic stays well-conditioned. Numerical hygiene.</p>
+
+<p>Rough intuition for what depth buys, with the caveat that it's a simplification: early layers resolve tokens into words and local grammar, middle layers build meaning and relationships, late layers narrow toward a specific prediction.</p>
 
 <div class="bannerwrap"><h2>
-<span class="sr">Turning vectors into a word</span>
+<span class="sr">Step 8 &#183; back to words</span>
 <span class="art" aria-hidden="true"></span></h2></div>
 
-<p>At the top of the stack, the vector at the final position is multiplied by an output matrix to give one score — a <em>logit</em> — for every token in the vocabulary. Softmax converts those to probabilities. Then something has to choose.</p>
+<p>At the top of the stack, take the vector at the <em>last</em> position — the one that has been accumulating context about what should come next — and multiply it by a final matrix with one row per vocabulary entry. That yields one raw score per possible token. These unnormalised scores are called <dfn>logits</dfn>, and softmax turns them into the probability distribution promised at the start.</p>
+
+<p>Something then has to choose one. That choice is not part of the model:</p>
+
+<ul>
+  <li><dfn>Temperature</dfn> divides the logits before softmax. Below 1 it sharpens the distribution toward the leader; above 1 it flattens toward uniform. At 0 it becomes "always take the maximum" and the model is fully deterministic.</li>
+  <li><dfn>Top-p</dfn> (nucleus sampling) discards the tail: keep the smallest set of candidates whose probabilities sum to p, renormalise, sample from those. It suppresses rare nonsense without fixing the number of options in advance.</li>
+</ul>
 
 <figure>
   <div class="grid2" style="gap:18px;margin-bottom:16px">
@@ -284,34 +400,58 @@ svg{max-width:100%;height:auto;display:block}
     </div>
   </div>
   <div id="sampler"></div>
-  <figcaption>Real softmax over a fixed set of illustrative logits, computed live. Temperature divides the logits before the exponential: below 1 it sharpens the distribution toward the leading candidate, above 1 it flattens it. Top-p truncates to the smallest set of candidates whose probabilities sum to p, then renormalises — greyed rows are excluded from sampling entirely.</figcaption>
+  <figcaption>Real softmax over a fixed set of illustrative logits, recomputed as you drag. Greyed rows have been cut by top-p and cannot be sampled at all. Pull temperature toward zero and watch everything collapse onto the leader.</figcaption>
 </figure>
 
-<p>Two things worth noticing here. First, at temperature 0 the model is deterministic: same input, same output, every time. The variability you see in chat is a sampling choice, not something intrinsic. Second, the model has no notion of a sentence, a plan, or a conclusion. It emits one token, appends it to the input, and runs the entire stack again. Any longer-range structure is an emergent property of doing that repeatedly with a good enough distribution.</p>
+<p>The chosen token is appended and the entire stack runs again from the beginning. The model has no plan, no draft, and no sense that a sentence is in progress. Longer structure is an emergent consequence of repeatedly making a good local choice.</p>
 
-<div class="note"><strong>The cost consequence.</strong> Generating token <em>n</em> requires attending over all <em>n−1</em> previous tokens. Done naively, producing a 1,000-token response means re-running attention over the whole prompt a thousand times. The fix is to keep every token's Key and Value vectors in GPU memory after computing them once — the <em>KV cache</em>. This is a different thing from the prompt caching on your bill, and confusing the two is the usual source of the confusion. Both are in the <a href="cache.html">third document</a>.</div>
+<div class="note"><strong>The cost consequence.</strong> Producing token <em>n</em> means attending over all <em>n</em>&#8722;1 tokens before it. Naively, a 1,000-token answer would reprocess the whole prompt a thousand times. The fix is to keep each token's key and value vectors in memory once computed &#8212; the <em>KV cache</em>. That is a different thing from the prompt caching on your bill, and confusing the two is the usual source of trouble. Both are in the <a href="cache.html">third document</a>.</div>
 
 <div class="bannerwrap"><h2>
 <span class="sr">What is not in there</span>
 <span class="art" aria-hidden="true"></span></h2></div>
 
-<p>Things people reasonably assume are present and are not:</p>
-
 <ul>
-  <li><strong>No memory across calls.</strong> No hidden state survives a request. Every turn re-sends the whole conversation and reprocesses it from scratch.</li>
-  <li><strong>No variable compute.</strong> A hard question and an easy one both get exactly the same number of layers. "Thinking" tokens are the workaround — they buy more forward passes by generating intermediate text to condition on.</li>
-  <li><strong>No lookup table.</strong> Nothing is stored verbatim and retrieved. Facts are distributed across billions of weights, which is why they can be subtly wrong in ways a database never is.</li>
-  <li><strong>No separate confidence signal.</strong> The probability distribution is the only thing there is. A confidently-worded wrong answer and a confidently-worded right one can be produced by very similar internal states.</li>
+  <li><strong>No memory between calls.</strong> No state survives a request. Every conversational turn re-sends the whole transcript and reprocesses it from scratch.</li>
+  <li><strong>No variable effort.</strong> A hard question and a trivial one get exactly the same number of layers. "Thinking" tokens are the workaround &#8212; generating intermediate text buys extra passes to condition on.</li>
+  <li><strong>No stored lookup table.</strong> Nothing is kept verbatim and retrieved. Facts live smeared across billions of weights, which is why they can be subtly wrong in ways a database never is.</li>
+  <li><strong>No confidence signal.</strong> The output distribution is all there is. High probability means "text like this usually continues this way", not "this is true".</li>
 </ul>
 
+<div class="bannerwrap" id="glossary"><h2>
+<span class="sr">Glossary</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<table>
+<tbody>
+<tr><td style="width:32%">token</td><td>A chunk of text, roughly a word or word-fragment. The model's atomic unit.</td></tr>
+<tr><td>vocabulary</td><td>The fixed list of every possible token, around 100,000 entries.</td></tr>
+<tr><td>embedding</td><td>The vector fetched from the embedding table for a given token ID.</td></tr>
+<tr><td>positional encoding</td><td>A vector added to the embedding so word order is visible to the model.</td></tr>
+<tr><td>attention</td><td>The operation letting each token pull a weighted blend of information from the others.</td></tr>
+<tr><td>query / key / value</td><td>Three vectors derived from each token: what it seeks, what it advertises, what it hands over.</td></tr>
+<tr><td>softmax</td><td>Exponentiate a list of numbers, divide by their sum. Gives positive weights totalling 1.</td></tr>
+<tr><td>causal mask</td><td>Forcing attention weights on later positions to zero, so nothing sees the future.</td></tr>
+<tr><td>autoregressive</td><td>Generating one token at a time, each conditioned only on what precedes it.</td></tr>
+<tr><td>head</td><td>One independent set of Q/K/V matrices. A layer runs many in parallel.</td></tr>
+<tr><td>feed-forward / MLP</td><td>The per-token half of a layer: two matrix multiplies with a nonlinearity between.</td></tr>
+<tr><td>residual stream</td><td>The running vector each block adds its output into, from input through to output.</td></tr>
+<tr><td>layer normalisation</td><td>Rescaling a vector to keep magnitudes numerically well-behaved.</td></tr>
+<tr><td>logits</td><td>Raw unnormalised scores over the vocabulary, before softmax.</td></tr>
+<tr><td>temperature</td><td>A divisor on the logits controlling how sharp or flat the output distribution is.</td></tr>
+<tr><td>top-p</td><td>Truncating candidates to the smallest set whose probabilities sum to p.</td></tr>
+<tr><td>parameters / weights</td><td>All the learned numbers together: the embedding table, every W matrix, everything.</td></tr>
+<tr><td>KV cache</td><td>Keys and values kept in memory during generation so they aren't recomputed per token.</td></tr>
+</tbody>
+</table>
+
 <div class="readmore">
-<h4>go play with a real one</h4>
+<h4>then go play with a real one</h4>
 <ul>
-  <li><a href="https://poloclub.github.io/transformer-explainer/">Transformer Explainer</a> (Georgia Tech) — runs a live GPT-2 in your browser. Type text, watch it flow through embedding, attention and next-token probabilities as a Sankey diagram. Start here.</li>
-  <li><a href="https://bbycroft.net/llm">bbycroft.net/llm</a> — Brendan Bycroft's 3D walkthrough of a working GPT-style network, zoomable down to individual matrix multiplies.</li>
-  <li><a href="https://www.youtube.com/watch?v=wjZofJX0v4M">3Blue1Brown, "Attention in transformers"</a> — the linear algebra, geometrically.</li>
-  <li><a href="https://jalammar.github.io/illustrated-transformer/">The Illustrated Transformer</a> — Jay Alammar's static walkthrough; still the clearest prose version.</li>
-  <li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> — the 2017 original. Short, and readable if you've got the above.</li>
+  <li><a href="https://poloclub.github.io/transformer-explainer/">Transformer Explainer</a> &#8212; runs a live GPT-2 in your browser. Type text and watch it move through the steps above with real trained weights. Best next stop.</li>
+  <li><a href="https://bbycroft.net/llm">bbycroft.net/llm</a> &#8212; a 3D walkthrough of a working model, zoomable down to individual multiplies.</li>
+  <li><a href="https://www.youtube.com/watch?v=wjZofJX0v4M">3Blue1Brown, "Attention in transformers"</a> &#8212; the same content, geometrically.</li>
+  <li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> &#8212; the 2017 paper. Short, and readable once you have the above.</li>
 </ul>
 </div>
 
@@ -321,42 +461,36 @@ svg{max-width:100%;height:auto;display:block}
 (function(){
 "use strict";
 
-/* ==================================================================== */
-/* section banners                                                       */
-/* ==================================================================== */
 var W = 70;
-document.querySelectorAll("h2").forEach(function(h2){
-  var title = h2.querySelector(".sr").textContent.toUpperCase();
-  var art = h2.querySelector(".art");
-  var pad = Math.max(0, Math.floor((W - title.length)/2));
+document.querySelectorAll(".bannerwrap h2").forEach(function(h2){
+  var t = h2.querySelector(".sr").textContent.toUpperCase();
+  var pad = Math.max(0, Math.floor((W - t.length)/2));
   var rule = new Array(W+1).join("=");
-  art.innerHTML =
-    "# " + rule + "\n#\n# " + new Array(pad+1).join(" ") +
-    "<b>" + title + "</b>\n#\n# " + rule;
+  h2.querySelector(".art").innerHTML =
+    "# " + rule + "\n#\n# " + new Array(pad+1).join(" ") + "<b>" + t + "</b>\n#\n# " + rule;
+});
+document.querySelectorAll("table").forEach(function(t){
+  var w = document.createElement("div"); w.className = "tblscroll";
+  t.parentNode.insertBefore(w, t); w.appendChild(t);
 });
 
 /* ==================================================================== */
 /* tokenizer approximation                                               */
 /* ==================================================================== */
-var tokIn = document.getElementById("tokIn"),
-    tokOut = document.getElementById("tokOut");
-
+var tokIn = document.getElementById("tokIn"), tokOut = document.getElementById("tokOut");
 function pseudoTokens(s){
   var raw = s.match(/\s*[A-Za-z]+|\s*\d+|\s*[^\sA-Za-z\d]|\s+/g) || [];
   var out = [];
   raw.forEach(function(t){
     var body = t.replace(/^\s+/,"");
-    // long words fragment, the way BPE does with rare vocabulary
-    if (body.length > 7){
-      out.push(t.slice(0, t.length - body.length + 5));
-      out.push(body.slice(5));
-    } else out.push(t);
+    if (body.length > 7){ out.push(t.slice(0, t.length-body.length+5)); out.push(body.slice(5)); }
+    else out.push(t);
   });
   return out.filter(function(t){ return t.length; });
 }
 function hashId(t){
   var h = 0;
-  for (var i=0;i<t.length;i++){ h = (h*31 + t.charCodeAt(i)) % 100000; }
+  for (var i=0;i<t.length;i++) h = (h*31 + t.charCodeAt(i)) % 100000;
   return h;
 }
 function renderTokens(){
@@ -365,11 +499,9 @@ function renderTokens(){
   ts.forEach(function(t){
     var d = document.createElement("span");
     d.className = "chip";
-    d.style.background = "#fff";
     d.textContent = t.replace(/ /g,"\u00b7");
     var id = document.createElement("span");
-    id.style.color = "var(--faint)";
-    id.style.marginLeft = "7px";
+    id.style.cssText = "color:var(--faint);margin-left:7px";
     id.textContent = hashId(t);
     d.appendChild(id);
     tokOut.appendChild(d);
@@ -384,33 +516,105 @@ tokIn.addEventListener("input", renderTokens);
 renderTokens();
 
 /* ==================================================================== */
-/* attention: real arithmetic on a 4-token / 4-dim toy                   */
+/* embedding lookup + positional encoding                                */
+/* ==================================================================== */
+var ETOK = ["The","\u00b7probe","\u00b7reached","\u00b7Jupiter"];
+var NDIM = 10, DMODEL = 5000, ei = 3;
+
+function seeded(seed){
+  var s = (seed >>> 0) || 1;
+  return function(){ s = (s*1664525 + 1013904223) >>> 0; return s/4294967296; };
+}
+function rowFor(id){
+  var r = seeded(id + 7), v = [];
+  for (var i=0;i<NDIM;i++) v.push(+((r()*2-1)*0.9).toFixed(2));
+  return v;
+}
+/* genuine sinusoidal positional encoding from Vaswani et al. */
+function posVec(p){
+  var v = [];
+  for (var i=0;i<NDIM;i++){
+    var f = Math.pow(10000, 2*Math.floor(i/2)/DMODEL);
+    v.push(+(i%2===0 ? Math.sin(p/f) : Math.cos(p/f)).toFixed(2));
+  }
+  return v;
+}
+
+var OTHER = [["\u00b7orbit",41290],["\u00b7Saturn",7731],["\u00b7the",464],["\u00b7launch",92817]];
+var embToks = document.getElementById("embToks");
+ETOK.forEach(function(t,i){
+  var b = document.createElement("button");
+  b.className = "tok"; b.textContent = t;
+  b.setAttribute("aria-pressed", i===ei ? "true":"false");
+  b.addEventListener("click", function(){ ei = i; drawEmb(); });
+  embToks.appendChild(b);
+});
+
+function drawEmb(){
+  embToks.querySelectorAll("button").forEach(function(b,i){
+    b.setAttribute("aria-pressed", i===ei ? "true":"false");
+  });
+  var tok = ETOK[ei], id = hashId(tok.replace(/\u00b7/g," "));
+  var rows = OTHER.map(function(o){ return {lab:o[0], id:o[1], on:false}; });
+  rows.push({lab:tok, id:id, on:true});
+  rows.sort(function(a,b){ return a.id - b.id; });
+
+  var host = document.getElementById("embTable");
+  host.innerHTML = "";
+  var hdr = document.createElement("div");
+  hdr.className = "emrow";
+  hdr.innerHTML = '<div class="idx" style="color:var(--faint)">row &#183; token</div>' +
+    Array.from({length:NDIM}, function(_,i){
+      return '<div class="cellv" style="color:var(--faint)">d' + i + '</div>'; }).join("");
+  host.appendChild(hdr);
+
+  rows.forEach(function(r){
+    var v = rowFor(r.id);
+    var d = document.createElement("div");
+    d.className = "emrow" + (r.on ? " on" : "");
+    d.innerHTML = '<div class="idx">' + r.id + "  " + r.lab + '</div>' +
+      v.map(function(n){ return '<div class="cellv">' + n.toFixed(2) + '</div>'; }).join("");
+    host.appendChild(d);
+  });
+  var el = document.createElement("div");
+  el.className = "emrow";
+  el.innerHTML = '<div class="idx" style="color:var(--faint)">&#8942;</div>';
+  host.appendChild(el);
+
+  var emb = rowFor(id), pos = posVec(ei);
+  var sum = emb.map(function(e,i){ return +(e + pos[i]).toFixed(2); });
+  var line = function(tag, vec, colour){
+    return '<div class="vecline"><div class="tag">' + tag + '</div>' +
+      vec.map(function(n){ return '<div class="n" style="color:' + colour + '">' +
+        n.toFixed(2) + '</div>'; }).join("") + '</div>';
+  };
+  document.getElementById("embMath").innerHTML =
+    line("embedding[" + id + "]", emb, "var(--q)") +
+    line("+ position[" + ei + "]", pos, "var(--k)") +
+    '<div style="border-top:1px solid var(--rule-2);margin:4px 0"></div>' +
+    line("= into layer 1", sum, "var(--ink)");
+}
+drawEmb();
+
+/* ==================================================================== */
+/* attention on a 4-token / 4-dim toy, real arithmetic                   */
 /* ==================================================================== */
 var TOK = ["The","probe","reached","Jupiter"];
-var Q = [[ 0.8, 0.1,-0.2, 0.3],
-         [ 0.2, 1.0, 0.3,-0.4],
-         [-0.1, 0.5, 1.0, 0.2],
-         [ 0.0, 0.9, 1.1, 0.2]];
-var K = [[ 1.0, 0.2,-0.4, 0.1],
-         [ 0.3, 1.1, 0.2,-0.5],
-         [-0.2, 0.4, 1.2, 0.3],
-         [ 0.1,-0.3, 0.5, 1.0]];
-var V = [[ 0.5,-0.2, 0.1, 0.4],
-         [-0.3, 0.8, 0.2,-0.1],
-         [ 0.2, 0.1, 0.9, 0.3],
-         [ 0.6, 0.4,-0.2, 0.7]];
+var Q = [[0.8,0.1,-0.2,0.3],[0.2,1.0,0.3,-0.4],[-0.1,0.5,1.0,0.2],[0.0,0.9,1.1,0.2]];
+var K = [[1.0,0.2,-0.4,0.1],[0.3,1.1,0.2,-0.5],[-0.2,0.4,1.2,0.3],[0.1,-0.3,0.5,1.0]];
+var V = [[0.5,-0.2,0.1,0.4],[-0.3,0.8,0.2,-0.1],[0.2,0.1,0.9,0.3],[0.6,0.4,-0.2,0.7]];
 var D = 4, qi = 3, stage = 0;
 
 function dot(a,b){ var s=0; for(var i=0;i<a.length;i++) s+=a[i]*b[i]; return s; }
 function f(x,n){ return (x<0?"":"\u2009") + x.toFixed(n===undefined?2:n); }
 
 function compute(){
-  var raw = K.map(function(k){ return dot(Q[qi], k); });
+  var raw = K.map(function(k){ return dot(Q[qi],k); });
   var scaled = raw.map(function(s){ return s/Math.sqrt(D); });
   var masked = scaled.map(function(s,j){ return j<=qi ? s : -Infinity; });
   var mx = Math.max.apply(null, masked.filter(isFinite));
   var ex = masked.map(function(s){ return isFinite(s) ? Math.exp(s-mx) : 0; });
-  var sum = ex.reduce(function(a,b){return a+b;},0);
+  var sum = ex.reduce(function(a,b){ return a+b; },0);
   var w = ex.map(function(e){ return e/sum; });
   var out = [0,0,0,0];
   w.forEach(function(wi,j){ for(var d=0;d<D;d++) out[d] += wi*V[j][d]; });
@@ -431,59 +635,45 @@ function draw(){
   qbtns.querySelectorAll("button").forEach(function(b,i){
     b.setAttribute("aria-pressed", i===qi ? "true":"false");
   });
-
-  var fmt = function(arr, dec, maskInf){
-    return arr.map(function(v,j){
-      if (maskInf && !isFinite(v)) return "  \u2212\u221e";
-      return f(v,dec);
-    }).join("   ");
+  var fmt = function(arr,dec,mi){
+    return arr.map(function(v){ return (mi && !isFinite(v)) ? "  \u2212\u221e" : f(v,dec); }).join("   ");
   };
   document.getElementById("s1").textContent = "q\u00b7k  =  " + fmt(r.raw,2);
   document.getElementById("s2").textContent = "\u00f7 2   =  " + fmt(r.scaled,2);
   document.getElementById("s3").textContent = "        " + fmt(r.masked,2,true);
   document.getElementById("s4").textContent = "w     =  " + fmt(r.w,3);
-  document.getElementById("s5").textContent = "out   =  [" + r.out.map(function(v){return v.toFixed(2);}).join(", ") + "]";
-
+  document.getElementById("s5").textContent = "out   =  [" + r.out.map(function(v){ return v.toFixed(2); }).join(", ") + "]";
   document.querySelectorAll(".steps .st").forEach(function(el){
     el.classList.toggle("on", (+el.dataset.s) <= stage);
   });
-
   var host = document.getElementById("abars");
   host.innerHTML = "";
   TOK.forEach(function(t,j){
-    var masked = j > qi;
+    var masked = j > qi, show = stage >= 4 && !masked;
     var row = document.createElement("div");
     row.className = "arow" + (masked ? " masked" : "");
-    var show = stage >= 4 && !masked;
-    row.innerHTML =
-      '<div class="lbl">' + t + '</div>' +
-      '<div class="track"><div class="abar" style="width:' +
-        (show ? (r.w[j]*100).toFixed(1) : 0) + '%"></div></div>' +
-      '<div class="val">' + (masked ? "\u2014" : (show ? r.w[j].toFixed(3) : "")) + '</div>';
+    row.innerHTML = '<div class="lbl">' + t + '</div><div class="track"><div class="abar" style="width:' +
+      (show ? (r.w[j]*100).toFixed(1) : 0) + '%"></div></div><div class="val">' +
+      (masked ? "\u2014" : (show ? r.w[j].toFixed(3) : "")) + '</div>';
     host.appendChild(row);
   });
 }
-
-document.getElementById("stepBtn").addEventListener("click", function(){
-  stage = stage >= 5 ? 5 : stage+1; draw();
-});
+document.getElementById("stepBtn").addEventListener("click", function(){ stage = stage>=5?5:stage+1; draw(); });
 document.getElementById("allBtn").addEventListener("click", function(){ stage=5; draw(); });
 document.getElementById("resetBtn").addEventListener("click", function(){ stage=0; draw(); });
 draw();
 
 /* ==================================================================== */
-/* multi-head illustrative patterns                                      */
+/* illustrative head patterns                                            */
 /* ==================================================================== */
 var HTOK = ["The","probe","that","JPL","built","reached","Jupiter"];
 var HEADS = [
-  {name:"head 3 \u00b7 attends to the previous token", f:function(i,j){ return j===i-1 ? 1 : (j===i ? .12 : 0); }},
-  {name:"head 7 \u00b7 attends to the sentence start", f:function(i,j){ return j===0 ? 1 : (j===i ? .2 : .05); }},
-  {name:"head 1 \u00b7 local window", f:function(i,j){ var d=i-j; return d>=0&&d<3 ? 1-d*0.32 : 0; }},
-  {name:"head 9 \u00b7 subject\u2013verb linkage", f:function(i,j){
-      if (i===5 && j===1) return 1;      // reached -> probe
-      if (i===6 && j===5) return .85;    // Jupiter -> reached
-      if (i===4 && j===3) return .8;     // built -> JPL
-      return j<=i ? .09 : 0; }}
+  {name:"a head that looks at the previous token", f:function(i,j){ return j===i-1?1:(j===i?.12:0); }},
+  {name:"a head that looks back at the sentence start", f:function(i,j){ return j===0?1:(j===i?.2:.05); }},
+  {name:"a head that looks at a local window", f:function(i,j){ var d=i-j; return d>=0&&d<3?1-d*.32:0; }},
+  {name:"a head that links verbs to their subjects", f:function(i,j){
+    if(i===5&&j===1) return 1; if(i===6&&j===5) return .85; if(i===4&&j===3) return .8;
+    return j<=i?.09:0; }}
 ];
 var hostH = document.getElementById("heads");
 HEADS.forEach(function(h){
@@ -493,65 +683,43 @@ HEADS.forEach(function(h){
   var g = document.createElement("div");
   g.className = "heat";
   g.style.gridTemplateColumns = "repeat(" + HTOK.length + ",1fr)";
-  for (var i=0;i<HTOK.length;i++){
-    for (var j=0;j<HTOK.length;j++){
-      var c = document.createElement("div");
-      c.className = "cell";
-      var v = j<=i ? Math.max(0, Math.min(1, h.f(i,j))) : -1;
-      if (v < 0){ c.style.background = "#E7EBE7"; }
-      else { c.style.background = "rgba(28,106,135," + (0.06 + v*0.94).toFixed(3) + ")"; }
-      c.title = HTOK[i] + " \u2190 " + HTOK[j];
-      g.appendChild(c);
-    }
+  for (var i=0;i<HTOK.length;i++) for (var j=0;j<HTOK.length;j++){
+    var c = document.createElement("div");
+    c.className = "cell";
+    var v = j<=i ? Math.max(0,Math.min(1,h.f(i,j))) : -1;
+    c.style.background = v<0 ? "#E7EBE7" : "rgba(28,106,135," + (0.06+v*0.94).toFixed(3) + ")";
+    c.title = HTOK[i] + " looking at " + HTOK[j];
+    g.appendChild(c);
   }
-  wrap.appendChild(cap); wrap.appendChild(g);
-  hostH.appendChild(wrap);
+  wrap.appendChild(cap); wrap.appendChild(g); hostH.appendChild(wrap);
 });
 
 /* ==================================================================== */
-/* sampling: live softmax with temperature and top-p                     */
+/* sampling                                                              */
 /* ==================================================================== */
-var CAND = [
-  ["\u00b7orbit",   4.10],
-  ["\u00b7Jupiter", 3.55],
-  ["\u00b7the",     3.20],
-  ["\u00b7its",     2.40],
-  ["\u00b7a",       1.85],
-  ["\u00b7Saturn",  1.10],
-  ["\u00b7lunch",  -1.40],
-  ["\u00b7purple", -2.60]
-];
-var temp = document.getElementById("temp"),
-    topp = document.getElementById("topp"),
+var CAND = [["\u00b7orbit",4.10],["\u00b7Jupiter",3.55],["\u00b7the",3.20],["\u00b7its",2.40],
+            ["\u00b7a",1.85],["\u00b7Saturn",1.10],["\u00b7lunch",-1.40],["\u00b7purple",-2.60]];
+var temp = document.getElementById("temp"), topp = document.getElementById("topp"),
     samp = document.getElementById("sampler");
-
 function drawSampler(){
-  var T = Math.max(0.01, +temp.value), P = +topp.value;
+  var T = Math.max(0.01,+temp.value), P = +topp.value;
   document.getElementById("tempV").textContent = T.toFixed(2);
   document.getElementById("toppV").textContent = P.toFixed(2);
-
-  var mx = Math.max.apply(null, CAND.map(function(c){return c[1]/T;}));
+  var mx = Math.max.apply(null, CAND.map(function(c){ return c[1]/T; }));
   var ex = CAND.map(function(c){ return Math.exp(c[1]/T - mx); });
-  var s = ex.reduce(function(a,b){return a+b;},0);
+  var s = ex.reduce(function(a,b){ return a+b; },0);
   var pr = ex.map(function(e){ return e/s; });
-
-  var idx = pr.map(function(p,i){return i;}).sort(function(a,b){return pr[b]-pr[a];});
+  var idx = pr.map(function(_,i){ return i; }).sort(function(a,b){ return pr[b]-pr[a]; });
   var keep = {}, acc = 0;
-  for (var n=0;n<idx.length;n++){
-    keep[idx[n]] = true; acc += pr[idx[n]];
-    if (acc >= P) break;
-  }
-
+  for (var n=0;n<idx.length;n++){ keep[idx[n]] = true; acc += pr[idx[n]]; if (acc >= P) break; }
   samp.innerHTML = "";
   CAND.forEach(function(c,i){
     var inSet = !!keep[i];
     var row = document.createElement("div");
     row.className = "arow" + (inSet ? "" : " masked");
-    row.innerHTML =
-      '<div class="lbl">' + c[0] + '</div>' +
-      '<div class="track"><div class="abar" style="width:' + (pr[i]*100).toFixed(2) +
-      '%;background:' + (inSet ? "var(--q)" : "var(--rule)") + '"></div></div>' +
-      '<div class="val">' + (pr[i]*100).toFixed(1) + '%</div>';
+    row.innerHTML = '<div class="lbl">' + c[0] + '</div><div class="track"><div class="abar" style="width:' +
+      (pr[i]*100).toFixed(2) + '%;background:' + (inSet?"var(--q)":"var(--rule)") +
+      '"></div></div><div class="val">' + (pr[i]*100).toFixed(1) + '%</div>';
     samp.appendChild(row);
   });
 }
