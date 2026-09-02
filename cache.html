@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How the cache works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBE7; --card:#F3F6F2; --ink:#16232A; --soft:#4A5A61; --faint:#7C8A8E;
+  --rule:#A9B6B2; --rule-2:#C9D2CE;
+  --q:#1C6A87; --k:#A34E19; --v:#5A4789; --hit:#2C7A57; --warn:#9E2B45;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Spectral,"Iowan Old Style",Georgia,serif;font-size:17px;line-height:1.62}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px 120px}
+a{color:var(--q);text-decoration:none;border-bottom:1px solid var(--rule)}
+a:hover{border-bottom-color:var(--q)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--q);outline-offset:2px}
+.bar{border-bottom:1px solid var(--rule);background:var(--card);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
+.bar .inner{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;gap:18px;flex-wrap:wrap;align-items:baseline}
+.bar a{border:0;color:var(--soft)}
+.bar a[aria-current]{color:var(--ink);font-weight:600}
+.bar a:hover{color:var(--q)}
+.bar .who{margin-left:auto;color:var(--faint)}
+header.title{padding:56px 0 8px}
+header.title h1{font-size:clamp(30px,6.2vw,46px);line-height:1.08;margin:0 0 14px;font-weight:600;letter-spacing:-.015em}
+header.title p.stand{font-size:19px;color:var(--soft);margin:0;max-width:60ch}
+.bannerwrap{container-type:inline-size;margin:64px 0 22px}
+h2 .art{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:clamp(6px,2.24cqw,15px);line-height:1.35;color:var(--rule);white-space:pre;margin:0;font-weight:400}
+h2 .art b{color:var(--ink);font-weight:600}
+h2{margin:0;font-weight:400}
+h3{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-size:14.5px;color:var(--ink);margin:40px 0 10px}
+h3::before{content:"# ===== ";color:var(--rule-2);font-weight:400}
+h4{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:600;margin:26px 0 8px}
+h4::before{content:"# --- ";color:var(--rule-2);font-weight:400}
+p{margin:0 0 18px;max-width:66ch}
+ul,ol{max-width:64ch;padding-left:22px}
+li{margin-bottom:9px}
+code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.87em;background:var(--card);padding:1px 5px;border:1px solid var(--rule-2);border-radius:2px}
+pre{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;line-height:1.6;background:var(--card);border:1px solid var(--rule-2);padding:14px 16px;overflow-x:auto}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+figure{margin:26px 0;background:var(--card);border:1px solid var(--rule-2);padding:18px}
+figcaption{font-size:14px;color:var(--soft);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule-2);max-width:70ch}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.note{border-left:3px solid var(--rule);padding:2px 0 2px 16px;color:var(--soft);font-size:16px;margin:22px 0}
+.note strong{color:var(--ink)}
+.note.hot{border-left-color:var(--warn)}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;border:1px solid var(--ink);background:var(--ink);color:var(--card);padding:7px 14px;cursor:pointer;border-radius:2px}
+.btn.ghost{background:transparent;color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+label.sl{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--soft);margin-bottom:4px}
+input[type=range]{width:100%;accent-color:var(--q)}
+select,input[type=number]{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;padding:6px 8px;border:1px solid var(--rule);background:#fff;border-radius:2px;color:var(--ink)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+th,td{text-align:left;padding:7px 12px 7px 0;border-bottom:1px solid var(--rule-2);vertical-align:top}
+th{color:var(--soft);font-weight:500}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+svg{max-width:100%;height:auto;display:block}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.readmore{background:var(--card);border:1px solid var(--rule);padding:18px 20px;margin:34px 0}
+.readmore h4{margin-top:0}
+.readmore ul{margin-bottom:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:620px){.grid2,.grid3{grid-template-columns:1fr}}
+.tblscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:18px}
+@media(max-width:660px){table{font-size:12.5px;min-width:440px}}
+
+/* prefix strip */
+.strip{display:flex;height:44px;border:1px solid var(--rule);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;margin-bottom:8px}
+.strip div{display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;color:#fff;transition:flex-grow .25s ease}
+.striplbl{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--soft);margin-bottom:6px}
+
+/* ttl sim */
+.tl{position:relative;height:60px;border:1px solid var(--rule);background:#fff;overflow:hidden;margin-bottom:10px}
+.tl .warm{position:absolute;top:0;bottom:0;background:rgba(44,122,87,.16)}
+.tl .ev{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
+.tl .ev.miss{background:var(--warn)}
+.tl .ev.hit{background:var(--hit)}
+.tl .now{position:absolute;top:0;bottom:0;width:1px;background:var(--k)}
+.tl .axis{position:absolute;bottom:0;left:0;right:0;height:15px;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint)}
+.tl .axis span{position:absolute;top:2px;transform:translateX(-50%)}
+.tl .axis i{position:absolute;bottom:0;width:1px;height:5px;background:var(--rule-2)}
+.log{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;min-height:52px;max-height:150px;overflow-y:auto;border:1px solid var(--rule-2);background:#fff;padding:8px 10px;color:var(--faint)}
+.log div{padding:2px 0;border-bottom:1px solid #EEF2EE}
+.log .h{color:var(--hit)}
+.log .m{color:var(--warn)}
+.stat{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--soft)}
+.stat b{color:var(--ink);font-variant-numeric:tabular-nums}
+.big{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:26px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi{border:1px solid var(--rule-2);background:#fff;padding:12px 14px}
+.kpi .lab{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;color:var(--faint);margin-bottom:4px}
+.kpi.win{border-color:var(--hit);background:rgba(44,122,87,.06)}
+.kpi.bad{border-color:var(--warn)}
+mark{background:rgba(44,122,87,.22);color:inherit;padding:0 2px}
+mark.f{background:rgba(163,78,25,.22)}
+</style>
+</head>
+<body>
+
+<nav class="bar"><div class="inner">
+  <a href="transformers.html">transformers</a>
+  <a href="llms.html">llms</a>
+  <a href="cache.html" aria-current="page">cache</a>
+  <span class="who">3 of 3 &#183; read in any order</span>
+</div></nav>
+
+<div class="wrap">
+
+<header class="title">
+  <h1>How the cache works</h1>
+  <p class="stand">Why your usage breakdown is mostly cache reads, what makes a prefix reusable, how long it survives, and what silently breaks it.</p>
+</header>
+
+<p>Two different things get called "the cache", and keeping them apart is most of the battle:</p>
+
+<table style="margin-bottom:26px">
+<thead><tr><th style="width:24%"></th><th style="width:38%">KV cache</th><th>Prompt caching</th></tr></thead>
+<tbody>
+<tr><td>What it is</td><td>Keys and values held in GPU memory while a single request runs</td><td>Prefix state kept between requests so it can be reused</td></tr>
+<tr><td>Lifetime</td><td>The request</td><td>5 minutes, or 1 hour if you pay for it</td></tr>
+<tr><td>You control it?</td><td>No &#8212; always on, invisible</td><td>Yes &#8212; via <code>cache_control</code> breakpoints</td></tr>
+<tr><td>On your bill?</td><td>No</td><td>Yes &#8212; <code>cache_creation_input_tokens</code> and <code>cache_read_input_tokens</code></td></tr>
+</tbody>
+</table>
+
+<p>They rest on the same mechanism, which is why the naming collides. This document covers the mechanism once, then spends most of its length on the second one, since that's the one on your invoice.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Prefill and decode</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Serving a request splits into two phases with completely different performance characteristics.</p>
+
+<p><strong>Prefill</strong> processes your entire prompt in one shot. All tokens go through all layers in parallel — big matrix multiplies, the GPU saturated, compute-bound. Every token's Key and Value vector at every layer gets computed and held in memory. This is what you wait for before the first token appears.</p>
+
+<p><strong>Decode</strong> then emits one token at a time. Each new token computes its own Q, K and V, attends over every cached K/V from before, and appends its own. One token wide, so the matrix multiplies are thin and the GPU spends most of its time waiting on memory bandwidth rather than computing. This phase is memory-bound, and it's why output tokens cost roughly five times input tokens.</p>
+
+<figure>
+<svg viewBox="0 0 680 250" role="img" aria-label="Prefill processes the whole prompt in parallel and fills the KV cache; decode then generates one token at a time reading from it">
+  <text x="8" y="18" font-family="IBM Plex Mono, monospace" font-size="12" fill="#1C6A87">PREFILL &#8212; all prompt tokens at once</text>
+  <g>
+    <rect x="8" y="30" width="26" height="26" fill="#1C6A87" opacity=".85"/>
+    <rect x="38" y="30" width="26" height="26" fill="#1C6A87" opacity=".85"/>
+    <rect x="68" y="30" width="26" height="26" fill="#1C6A87" opacity=".85"/>
+    <rect x="98" y="30" width="26" height="26" fill="#1C6A87" opacity=".85"/>
+    <rect x="128" y="30" width="26" height="26" fill="#1C6A87" opacity=".85"/>
+    <rect x="158" y="30" width="26" height="26" fill="#1C6A87" opacity=".85"/>
+    <rect x="188" y="30" width="26" height="26" fill="#1C6A87" opacity=".85"/>
+  </g>
+  <text x="228" y="48" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">compute-bound &#183; one big parallel pass</text>
+
+  <path d="M110,60 L110,80" stroke="#4A5A61" fill="none"/>
+  <rect x="8" y="82" width="380" height="34" fill="#F3F6F2" stroke="#4A5A61"/>
+  <text x="20" y="104" font-family="IBM Plex Mono, monospace" font-size="12" fill="#16232A">KV cache &#8212; K and V for every token, every layer</text>
+
+  <text x="8" y="152" font-family="IBM Plex Mono, monospace" font-size="12" fill="#A34E19">DECODE &#8212; one token at a time</text>
+  <g>
+    <rect x="8" y="164" width="26" height="26" fill="#C9D2CE"/>
+    <rect x="38" y="164" width="26" height="26" fill="#C9D2CE"/>
+    <rect x="68" y="164" width="26" height="26" fill="#C9D2CE"/>
+    <rect x="98" y="164" width="26" height="26" fill="#C9D2CE"/>
+    <rect x="128" y="164" width="26" height="26" fill="#C9D2CE"/>
+    <rect x="158" y="164" width="26" height="26" fill="#C9D2CE"/>
+    <rect x="188" y="164" width="26" height="26" fill="#C9D2CE"/>
+    <rect x="218" y="164" width="26" height="26" fill="#A34E19"/>
+  </g>
+  <path d="M231,160 L231,120" stroke="#A34E19" fill="none" stroke-dasharray="3 3"/>
+  <text x="258" y="182" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">reads all of it, appends one entry, repeats</text>
+  <text x="8" y="222" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">without the KV cache, generating token n would re-run attention over all n&#8722;1 previous tokens</text>
+  <text x="8" y="238" font-family="IBM Plex Mono, monospace" font-size="11" fill="#7C8A8E">from scratch &#8212; quadratic instead of linear. this cache is not optional and not billed.</text>
+</svg>
+<figcaption>Scale, for a sense of why this matters: a large model with a long context can need hundreds of gigabytes of KV cache across concurrent requests &#8212; often more memory than the weights themselves. Managing it is most of what an inference server does.</figcaption>
+</figure>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Why a prefix can be reused</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Here's the load-bearing fact, and it comes straight from the causal mask in the <a href="transformers.html">first document</a>:</p>
+
+<div class="note"><strong>Token <em>i</em>'s Key and Value vectors depend only on tokens 1 through <em>i</em>.</strong> Nothing that comes later can change them, because attention at position <em>i</em> cannot see past it.</div>
+
+<p>So if two requests begin with byte-identical text, the K/V state for that shared span is identical too — not similar, <em>identical</em>. It can be computed once and reused. The expensive prefill for that span never has to run again.</p>
+
+<p>Three consequences fall straight out of this, and between them they explain almost every caching surprise:</p>
+
+<ul>
+  <li><strong>It's a prefix cache, not a content cache.</strong> Reuse only works from the start of the prompt forward, up to the first difference. A cached paragraph that appears in the middle of an otherwise-different prompt buys you nothing.</li>
+  <li><strong>One token of difference kills everything after it.</strong> Change token 40 of a 50,000-token prompt and tokens 41 onward must be recomputed. A timestamp near the top of a system prompt costs you the entire cache.</li>
+  <li><strong>Order is the whole design.</strong> Static content first, volatile content last. The request is assembled as <code>tools</code> → <code>system</code> → <code>messages</code>, in that order, and that's the order the hierarchy invalidates in.</li>
+</ul>
+
+<figure>
+  <label class="sl" for="div">where the two requests first differ &#8212; <span id="divV" class="mono">token 12,000 of 14,000</span></label>
+  <input type="range" id="div" min="0" max="14000" step="250" value="12000">
+  <div style="margin-top:16px">
+    <div class="striplbl">request N &#8212; what gets reused vs recomputed</div>
+    <div class="strip" id="stripA"></div>
+    <div class="stat" id="stripStat"></div>
+  </div>
+  <figcaption>Drag the divergence point. Everything to its left is a cache read at one tenth the input price; everything to its right is full-price prefill, however similar it looks to last time. Notice how quickly the economics collapse as the divergence moves left &#8212; this is why a per-request timestamp in a system prompt is such an expensive habit.</figcaption>
+</figure>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Breakpoints and the lookback window</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Reuse doesn't happen for free — the API only writes a cache entry where you tell it to. That marker is <code>cache_control</code>, and it goes on a content block:</p>
+
+<pre><code>system=[
+    {"type": "text", "text": WHOLE_STYLE_GUIDE,
+     "cache_control": {"type": "ephemeral"}},
+]</code></pre>
+
+<p>Three rules govern what happens next, and getting them wrong is the usual cause of "I enabled caching and nothing changed":</p>
+
+<ol>
+  <li><strong>Writes happen only at your breakpoint.</strong> Marking a block writes exactly one entry — a hash of the entire prefix ending at that block. No entries are written at any earlier position.</li>
+  <li><strong>Reads look backward for entries a previous request wrote.</strong> The API hashes the prefix at your breakpoint; if there's no match it walks back one block at a time looking for a hash that some earlier request already stored. It is hunting for <em>prior writes</em>, not for stable-looking content.</li>
+  <li><strong>The lookback window is 20 blocks.</strong> If no match turns up within 20 positions, it stops.</li>
+</ol>
+
+<p>Rule 2 is the one that catches people. Consider a prompt with a large static system context in blocks 1–5 and a per-request block 6 containing a timestamp and the user's message, with the breakpoint on block 6:</p>
+
+<pre><code>request 1  hash(1..6) written             &#8592; includes the timestamp
+request 2  hash(1..6) differs &#8594; no match
+           walk back: 5, 4, 3, 2, 1 &#8212; nothing was ever written there
+           result: full-price prefill, plus another useless write</code></pre>
+
+<p>You pay the 25% write premium on every single request and never once get a read. The lookback cannot rescue you, because it only finds entries that earlier requests wrote, and writes only happen at breakpoints. Move <code>cache_control</code> to block 5 — the last block that's identical across requests — and every subsequent request hits.</p>
+
+<p>You get up to four breakpoints. A second reason to use more than one: in a long conversation each turn appends blocks, and once your breakpoint drifts 20 or more blocks past the last write, the window misses it. An extra breakpoint further back gives the lookback something to find.</p>
+
+<div class="note"><strong>Breakpoints are free.</strong> Adding them doesn't cost anything by itself. You're billed on tokens written and tokens read, not on the number of markers. There's no reason to be stingy with the four you get.</div>
+
+<h3>Or let the API place it for you</h3>
+
+<p>For a straightforward growing conversation, put <code>cache_control</code> at the top level of the request and the breakpoint moves forward on its own as turns accumulate:</p>
+
+<pre><code>response = client.messages.create(
+    model="claude-opus-5",
+    max_tokens=1024,
+    cache_control={"type": "ephemeral"},   # automatic
+    system=SYSTEM_PROMPT,
+    messages=history,
+)</code></pre>
+
+<p>It places the breakpoint on the last cacheable block, so it walks into exactly the same trap as above when your last block is the one that varies. For a plain chat transcript it's the right default; for a prompt with a volatile tail, use an explicit breakpoint at the end of the static prefix instead.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">How long it lives</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Five minutes by default. Reading the entry <strong>refreshes it at no charge</strong>, so an active session stays warm indefinitely without ever paying a second write. The clock starts when the request that touches the entry <em>begins</em>, not when its response finishes — so a four-minute streaming response leaves roughly one minute of usable life after it completes.</p>
+
+<figure>
+  <div class="row">
+    <button class="btn" id="send">send a request</button>
+    <button class="btn ghost" data-adv="60">wait 1 min</button>
+    <button class="btn ghost" data-adv="240">wait 4 min</button>
+    <button class="btn ghost" data-adv="420">wait 7 min</button>
+    <button class="btn ghost" id="simReset">reset</button>
+  </div>
+  <div class="tl" id="tl"><div class="axis" id="axis"></div></div>
+  <div class="grid2" style="gap:14px;margin-bottom:12px">
+    <div class="stat" id="simState"></div>
+    <div class="stat" id="simCost" style="text-align:right"></div>
+  </div>
+  <div class="log" id="log"><div style="border:0">Send a request to start the clock. Then wait, and send another.</div></div>
+  <figcaption>A 30,000-token prefix on Claude Opus 5, 5-minute TTL. Green bands are windows where the entry is live. Send a few requests a minute apart and watch the cost curve flatten; then wait seven minutes and watch it start over at a write. The write costs 25% more than plain input, so a cache that never gets read is strictly worse than no cache at all.</figcaption>
+</figure>
+
+<h3>When the hour is worth buying</h3>
+
+<p>The 1-hour TTL is an explicit opt-in and costs double base input on the write:</p>
+
+<pre><code>"cache_control": {"type": "ephemeral", "ttl": "1h"}</code></pre>
+
+<p>The break-even arithmetic is simple. A 5-minute write carries a 0.25× premium and each read saves 0.9×, so <strong>one read pays it back</strong>. A 1-hour write carries a 1.0× premium, so it needs <strong>two reads</strong> before it's ahead. If your traffic is more frequent than every five minutes, the standard cache refreshes for free and the hour buys you nothing. It earns its keep when gaps land in the awkward zone — longer than five minutes, shorter than an hour. A side-agent that runs for eight minutes, or a user who takes a coffee break mid-conversation.</p>
+
+<p>If you mix TTLs in one request, the longer one has to come first: all 1-hour breakpoints before any 5-minute breakpoints.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">What this costs</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<figure>
+  <div class="grid3" style="margin-bottom:18px">
+    <div>
+      <label class="sl" for="mdl">model</label>
+      <select id="mdl" style="width:100%">
+        <option value="5,6.25,10,0.5">Claude Opus 5 &#183; $5/MTok</option>
+        <option value="5,6.25,10,0.5">Claude Opus 4.8 &#183; $5/MTok</option>
+        <option value="2,2.5,4,0.2">Claude Sonnet 5 &#183; $2/MTok</option>
+        <option value="1,1.25,2,0.1">Claude Haiku 4.5 &#183; $1/MTok</option>
+      </select>
+    </div>
+    <div>
+      <label class="sl" for="pfx">stable prefix &#183; <span id="pfxV" class="mono">30,000</span> tok</label>
+      <input type="range" id="pfx" min="1000" max="150000" step="1000" value="30000">
+    </div>
+    <div>
+      <label class="sl" for="nreq">requests &#183; <span id="nreqV" class="mono">40</span></label>
+      <input type="range" id="nreq" min="2" max="200" step="1" value="40">
+    </div>
+  </div>
+  <div style="margin-bottom:18px">
+    <label class="sl" for="gap">gap between requests &#183; <span id="gapV" class="mono">45 s</span></label>
+    <input type="range" id="gap" min="5" max="5400" step="5" value="45">
+  </div>
+
+  <div class="grid3" id="kpis"></div>
+  <div class="stat" id="calcNote" style="margin-top:14px"></div>
+
+  <figcaption>Prices are per million tokens, from Anthropic's published prompt-caching table: writes are 1.25&#215; base for the 5-minute TTL and 2&#215; for the hour, reads are 0.1&#215; base. Only the stable prefix is modelled &#8212; per-request messages and output are excluded, since they're identical across all three strategies. Push the gap past five minutes and watch the 5-minute column go from best to worst.</figcaption>
+</figure>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Reading your usage numbers</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>The response reports three separate input counts, and the one named <code>input_tokens</code> is <em>not</em> your total. It's only the tokens after the last breakpoint.</p>
+
+<pre><code>total_input = cache_read_input_tokens
+            + cache_creation_input_tokens
+            + input_tokens</code></pre>
+
+<figure>
+  <div class="strip" id="usageStrip"></div>
+  <div class="stat" id="usageStat" style="margin-bottom:14px"></div>
+<pre style="margin:0"><code>"usage": {
+  "cache_read_input_tokens":     29800,   <span style="color:#2C7A57">// reused prefix &#183; 0.1&#215; price</span>
+  "cache_creation_input_tokens":   240,   <span style="color:#A34E19">// written this call &#183; 1.25&#215; price</span>
+  "input_tokens":                   62,   <span style="color:#4A5A61">// after the breakpoint &#183; full price</span>
+  "output_tokens":                 503
+}</code></pre>
+  <figcaption>This is what a healthy warm agentic session looks like: a large read, a small write for whatever was appended since the last call, and a handful of genuinely new tokens. If <code>input_tokens</code> looks implausibly small next to what you sent, that's the feature working, not a reporting bug. It also matters for rate limits &#8212; cache hits don't count against them.</figcaption>
+</figure>
+
+<div class="note hot"><strong>The diagnostic that answers most questions.</strong> If <code>cache_creation_input_tokens</code> and <code>cache_read_input_tokens</code> are <em>both zero</em>, no caching happened at all &#8212; and no error was raised. The usual causes are a prompt below the minimum cacheable length, a missing or stripped <code>cache_control</code> field, or a proxy in front of the API that dropped it. If you reach the API through a gateway or corporate proxy, this pair of fields is the cheapest way to confirm the breakpoint survived the trip: fire the same request twice in quick succession and check whether the second one reads.</div>
+
+<h3>Minimum cacheable length</h3>
+
+<p>Below the threshold, <code>cache_control</code> is silently ignored. No error, no caching, no clue unless you check the usage fields.</p>
+
+<table>
+<thead><tr><th class="num" style="width:22%">minimum</th><th>models</th></tr></thead>
+<tbody>
+<tr><td class="num">512</td><td>Opus 5, Fable 5 / 5.1, Mythos 5 / 5.1</td></tr>
+<tr><td class="num">1,024</td><td>Opus 4.8, Opus 4.1, Opus 4, Sonnet 5, Sonnet 4.6, Sonnet 4.5, Sonnet 4</td></tr>
+<tr><td class="num">2,048</td><td>Opus 4.7, Haiku 3.5, Mythos Preview</td></tr>
+<tr><td class="num">4,096</td><td>Opus 4.6, Opus 4.5, Haiku 4.5</td></tr>
+</tbody>
+</table>
+
+<p style="margin-top:14px">If you're just short of the threshold, padding the cached region to reach it is usually worth doing — reads are cheap enough that crossing the line pays for the extra tokens quickly.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">What breaks it</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Invalidation follows the <code>tools</code> → <code>system</code> → <code>messages</code> hierarchy: a change at one level invalidates that level and everything after it.</p>
+
+<table>
+<thead><tr><th style="width:30%">change</th><th class="num" style="width:9%">tools</th><th class="num" style="width:9%">system</th><th class="num" style="width:9%">msgs</th><th>why</th></tr></thead>
+<tbody>
+<tr><td>any tool definition</td><td class="num" style="color:var(--warn)">&#10008;</td><td class="num" style="color:var(--warn)">&#10008;</td><td class="num" style="color:var(--warn)">&#10008;</td><td>tools sit first, so editing one name or description invalidates the entire prompt</td></tr>
+<tr><td>web search on/off</td><td class="num" style="color:var(--hit)">&#10004;</td><td class="num" style="color:var(--warn)">&#10008;</td><td class="num" style="color:var(--warn)">&#10008;</td><td>modifies the system prompt behind the scenes</td></tr>
+<tr><td>citations on/off</td><td class="num" style="color:var(--hit)">&#10004;</td><td class="num" style="color:var(--warn)">&#10008;</td><td class="num" style="color:var(--warn)">&#10008;</td><td>likewise</td></tr>
+<tr><td><code>tool_choice</code></td><td class="num" style="color:var(--hit)">&#10004;</td><td class="num" style="color:var(--hit)">&#10004;</td><td class="num" style="color:var(--warn)">&#10008;</td><td>rendered into the message section only</td></tr>
+<tr><td>adding or removing an image</td><td class="num" style="color:var(--hit)">&#10004;</td><td class="num" style="color:var(--hit)">&#10004;</td><td class="num" style="color:var(--warn)">&#10008;</td><td>anywhere in the prompt, not just near the change</td></tr>
+<tr><td>thinking configuration</td><td class="num">model-specific</td><td class="num">model-specific</td><td class="num" style="color:var(--warn)">&#10008;</td><td>the mode and token budget are rendered into the prompt</td></tr>
+<tr><td>effort setting</td><td class="num">model-specific</td><td class="num">model-specific</td><td class="num" style="color:var(--warn)">&#10008;</td><td>same mechanism; setting it explicitly to the default is a no-op</td></tr>
+</tbody>
+</table>
+
+<h4>and the non-obvious ones</h4>
+
+<ul>
+  <li><strong>Unstable JSON key ordering.</strong> Some languages randomise map iteration order when serialising. If your <code>tool_use</code> blocks come out with keys in a different order each time, the bytes differ and the cache misses every request. Go and Swift are the usual offenders.</li>
+  <li><strong>Anything derived from the clock.</strong> A date, a request ID, a session token near the top of a system prompt. Move it to the end or drop it.</li>
+  <li><strong>Concurrency.</strong> An entry only becomes available once the first response has begun. Fire ten parallel requests with the same new prefix and you'll pay ten writes. Let the first one land, then fan out.</li>
+  <li><strong>Isolation boundaries.</strong> Caches never cross organisations. On the Claude API they're also isolated per workspace; Bedrock and Google Cloud isolate at the organisation level only. If you split traffic across workspaces, you split your cache too.</li>
+</ul>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Warming it before you need it</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>If the first user request of the day shouldn't eat the cold-prefill latency, you can pay for the write in advance with <code>max_tokens: 0</code>. The API reads the prompt, writes the entry, and returns immediately with an empty <code>content</code> array and no output tokens billed.</p>
+
+<pre><code>client.messages.create(
+    model="claude-opus-5",
+    max_tokens=0,
+    system=[{"type": "text", "text": SYSTEM_PROMPT,
+             "cache_control": {"type": "ephemeral"}}],
+    messages=[{"role": "user", "content": "warmup"}],
+)</code></pre>
+
+<p>Put the breakpoint on the shared prefix, not on the placeholder message — otherwise the entry is keyed to the placeholder and your real traffic won't hit it. Automatic caching is wrong here for exactly that reason. Match the thinking and effort settings to your real requests too, since those get rendered into the prompt. And the TTL still applies: keep re-warming inside the window, or buy the hour.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Checklist</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<ol>
+  <li>Order the prompt <code>tools</code> → <code>system</code> → static context → volatile content. Nothing time-varying above the breakpoint.</li>
+  <li>Put <code>cache_control</code> on the last block that is byte-identical across the requests meant to share a cache.</li>
+  <li>Confirm the cached region clears your model's minimum length.</li>
+  <li>Check <code>cache_read_input_tokens</code> on the second request. Both counters zero means caching never engaged.</li>
+  <li>Keep <code>tool_choice</code>, image presence, thinking config and effort constant across calls in a session.</li>
+  <li>Reach for the 1-hour TTL only when gaps genuinely exceed five minutes but stay under an hour.</li>
+  <li>Add a second breakpoint further back when a conversation grows more than 20 blocks past the last write.</li>
+  <li>Let the first request of a new prefix complete before fanning out in parallel.</li>
+</ol>
+
+<div class="readmore">
+<h4>sources</h4>
+<ul>
+  <li><a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching">Prompt caching</a> &#8212; Anthropic's reference page. Every price, threshold and invalidation rule above comes from here; check it before acting on any of this, since the numbers move.</li>
+  <li><a href="https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics">Cache diagnostics</a> (beta) &#8212; has the API compare consecutive requests and report exactly where the prefix diverged. Faster than bisecting by hand.</li>
+  <li><a href="https://magazine.sebastianraschka.com/p/coding-the-kv-cache-in-llms">Coding the KV cache from scratch</a> &#8212; Sebastian Raschka, for the mechanism underneath, in about 100 lines of readable Python.</li>
+  <li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html">Bedrock prompt caching</a> &#8212; if you go through Bedrock, the minimums, usage field names and failure behaviour are AWS's, not Anthropic's.</li>
+</ul>
+</div>
+
+<p class="mono" style="font-size:12px;color:var(--faint);margin-top:40px">Prices and thresholds verified against Anthropic's documentation on 2 September 2026. They change; the mechanism doesn't.</p>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var W = 70;
+document.querySelectorAll("h2").forEach(function(h2){
+  var t = h2.querySelector(".sr").textContent.toUpperCase();
+  var pad = Math.max(0, Math.floor((W - t.length)/2));
+  var rule = new Array(W+1).join("=");
+  h2.querySelector(".art").innerHTML =
+    "# " + rule + "\n#\n# " + new Array(pad+1).join(" ") + "<b>" + t + "</b>\n#\n# " + rule;
+});
+
+/* wide monospace tables scroll rather than blow out the page on phones */
+document.querySelectorAll("table").forEach(function(t){
+  var w = document.createElement("div");
+  w.className = "tblscroll";
+  t.parentNode.insertBefore(w, t);
+  w.appendChild(t);
+});
+
+var fmtN = function(n){ return Math.round(n).toLocaleString(); };
+var usd  = function(v){
+  if (v >= 100) return "$" + v.toFixed(0);
+  if (v >= 1)   return "$" + v.toFixed(2);
+  return "$" + v.toFixed(3);
+};
+
+/* ==================================================================== */
+/* divergence strip                                                      */
+/* ==================================================================== */
+var TOTAL = 14000, BASE = 5, READ = 0.5, WRITE5 = 6.25;
+var dv = document.getElementById("div");
+
+function drawStrip(){
+  var d = +dv.value;
+  var reuse = d, fresh = TOTAL - d;
+  document.getElementById("divV").textContent =
+    "token " + fmtN(d) + " of " + fmtN(TOTAL);
+
+  var s = document.getElementById("stripA");
+  s.innerHTML = "";
+  if (reuse > 0){
+    var a = document.createElement("div");
+    a.style.cssText = "flex:" + reuse + ";background:#2C7A57";
+    a.textContent = reuse/TOTAL > .16 ? "cache read \u00b7 " + fmtN(reuse) : "";
+    s.appendChild(a);
+  }
+  if (fresh > 0){
+    var b = document.createElement("div");
+    b.style.cssText = "flex:" + fresh + ";background:#A34E19";
+    b.textContent = fresh/TOTAL > .16 ? "recomputed \u00b7 " + fmtN(fresh) : "";
+    s.appendChild(b);
+  }
+
+  var cached = (reuse*READ + fresh*WRITE5)/1e6;
+  var plain  = (TOTAL*BASE)/1e6;
+  document.getElementById("stripStat").innerHTML =
+    "this call: <b>" + usd(cached) + "</b> vs <b>" + usd(plain) +
+    "</b> with no caching &#183; saving <b>" +
+    (plain > 0 ? Math.round((1-cached/plain)*100) : 0) + "%</b>";
+}
+dv.addEventListener("input", drawStrip);
+drawStrip();
+
+/* ==================================================================== */
+/* TTL simulator                                                         */
+/* ==================================================================== */
+var SIM_PFX = 30000, TTL = 300, SPAN = 1500;   // 25 min of simulated timeline
+var now = 0, expiry = -1, cost = 0, reads = 0, writes = 0;
+var warms = [], events = [];
+
+function simDraw(){
+  var tl = document.getElementById("tl");
+  tl.querySelectorAll(".warm,.ev,.now").forEach(function(e){ e.remove(); });
+  var pct = function(t){ return (Math.min(t, SPAN)/SPAN*100) + "%"; };
+
+  warms.forEach(function(w){
+    var d = document.createElement("div");
+    d.className = "warm";
+    var end = Math.min(w.end, SPAN);
+    d.style.left = pct(w.start);
+    d.style.width = ((end - w.start)/SPAN*100) + "%";
+    tl.appendChild(d);
+  });
+  events.forEach(function(e){
+    var d = document.createElement("div");
+    d.className = "ev " + (e.hit ? "hit" : "miss");
+    d.style.left = pct(e.t);
+    tl.appendChild(d);
+  });
+  var n = document.createElement("div");
+  n.className = "now"; n.style.left = pct(now);
+  tl.appendChild(n);
+
+  var live = now < expiry;
+  document.getElementById("simState").innerHTML =
+    "clock <b>" + Math.floor(now/60) + "m " + (now%60) + "s</b> &#183; cache " +
+    (live ? '<b style="color:#2C7A57">warm</b>, expires in <b>' +
+      Math.max(0, Math.round(expiry-now)) + "s</b>"
+          : '<b style="color:#9E2B45">cold</b>');
+  document.getElementById("simCost").innerHTML =
+    "<b>" + writes + "</b> write" + (writes===1?"":"s") + " &#183; <b>" + reads +
+    "</b> read" + (reads===1?"":"s") + " &#183; total <b>" + usd(cost) + "</b>";
+}
+
+function simSend(){
+  var hit = now < expiry;
+  if (hit){ reads++; cost += SIM_PFX*READ/1e6; }
+  else    { writes++; cost += SIM_PFX*WRITE5/1e6; }
+  events.push({t:now, hit:hit});
+  if (hit && warms.length) warms[warms.length-1].end = now + TTL;
+  else warms.push({start:now, end:now + TTL});
+  expiry = now + TTL;
+
+  var l = document.getElementById("log");
+  if (!l.dataset.started){ l.innerHTML = ""; l.dataset.started = "1"; l.style.color = "var(--ink)"; }
+  var d = document.createElement("div");
+  d.className = hit ? "h" : "m";
+  d.innerHTML = "t+" + String(Math.floor(now/60)).padStart(2,"0") + ":" +
+    String(now%60).padStart(2,"0") + "  " +
+    (hit ? "HIT   read  " : "MISS  write ") + fmtN(SIM_PFX) + " tok   " +
+    usd(SIM_PFX*(hit?READ:WRITE5)/1e6);
+  l.insertBefore(d, l.firstChild);
+  simDraw();
+}
+function simAdvance(s){ now = Math.min(now + s, SPAN); simDraw(); }
+
+document.getElementById("send").addEventListener("click", simSend);
+document.querySelectorAll("[data-adv]").forEach(function(b){
+  b.addEventListener("click", function(){ simAdvance(+b.dataset.adv); });
+});
+document.getElementById("simReset").addEventListener("click", function(){
+  now=0; expiry=-1; cost=0; reads=0; writes=0; warms=[]; events=[];
+  var l = document.getElementById("log");
+  l.innerHTML = '<div style="border:0">Send a request to start the clock. Then wait, and send another.</div>';
+  delete l.dataset.started;
+  l.style.color = "var(--faint)";
+  simDraw();
+});
+(function(){
+  var ax = document.getElementById("axis");
+  for (var m=5; m<=20; m+=5){
+    var x = (m*60/SPAN*100) + "%";
+    var s = document.createElement("span");
+    s.style.left = x; s.textContent = m + "m";
+    ax.appendChild(s);
+    var t = document.createElement("i");
+    t.style.left = x;
+    ax.appendChild(t);
+  }
+})();
+simDraw();
+
+/* ==================================================================== */
+/* cost calculator                                                       */
+/* ==================================================================== */
+var mdl=document.getElementById("mdl"), pfx=document.getElementById("pfx"),
+    nreq=document.getElementById("nreq"), gap=document.getElementById("gap");
+
+function calc(){
+  var p = mdl.value.split(",").map(Number);
+  var base=p[0], w5=p[1], w1h=p[2], rd=p[3];
+  var P=+pfx.value, N=+nreq.value, G=+gap.value;
+
+  document.getElementById("pfxV").textContent  = fmtN(P);
+  document.getElementById("nreqV").textContent = N;
+  document.getElementById("gapV").textContent  =
+    G < 60 ? G + " s" : (G/60).toFixed(G%60?1:0) + " min";
+
+  var M = P/1e6;
+  var none = N * M * base;
+  var c5   = (G <= 300)  ? M*w5  + (N-1)*M*rd : N * M * w5;
+  var c1h  = (G <= 3600) ? M*w1h + (N-1)*M*rd : N * M * w1h;
+
+  var opts = [
+    {k:"no caching", v:none, sub:N + " \u00d7 full-price prefill"},
+    {k:"5-minute TTL", v:c5,
+     sub: G<=300 ? "1 write + " + (N-1) + " free-refreshed reads"
+                 : "every call expires \u2014 " + N + " writes, 0 reads"},
+    {k:"1-hour TTL", v:c1h,
+     sub: G<=3600 ? "1 write at 2\u00d7 + " + (N-1) + " reads"
+                  : "every call expires \u2014 " + N + " writes, 0 reads"}
+  ];
+  var best = Math.min(none, c5, c1h), worst = Math.max(none, c5, c1h);
+
+  var host = document.getElementById("kpis");
+  host.innerHTML = "";
+  opts.forEach(function(o){
+    var d = document.createElement("div");
+    d.className = "kpi" + (o.v===best ? " win" : (o.v===worst ? " bad" : ""));
+    d.innerHTML = '<div class="lab">' + o.k + '</div><div class="big">' +
+      usd(o.v) + '</div><div class="lab" style="margin:6px 0 0">' + o.sub + '</div>';
+    host.appendChild(d);
+  });
+
+  var saved = none > 0 ? (1 - best/none) : 0;
+  var msg = "Cheapest option saves <b>" + Math.round(saved*100) +
+            "%</b> on the prefix versus no caching, across " + N + " calls.";
+  if (G > 300 && G <= 3600)
+    msg += " The gap is past 5 minutes, so the standard cache expires between every call &#8212; " +
+           "this is the window where the hour earns its premium.";
+  else if (G > 3600)
+    msg += " Past an hour, nothing survives. Caching costs more than not caching here.";
+  else if (N === 2)
+    msg += " At two calls the 5-minute write has just about paid for itself; the hour needs a third.";
+  document.getElementById("calcNote").innerHTML = msg;
+}
+[mdl,pfx,nreq,gap].forEach(function(el){ el.addEventListener("input", calc); });
+calc();
+
+/* ==================================================================== */
+/* usage field decomposition                                             */
+/* ==================================================================== */
+(function(){
+  var parts = [
+    {n:"cache_read", v:29800, c:"#2C7A57"},
+    {n:"cache_creation", v:240, c:"#A34E19"},
+    {n:"input", v:62, c:"#4A5A61"}
+  ];
+  var tot = parts.reduce(function(a,b){ return a + b.v; }, 0);
+  var s = document.getElementById("usageStrip");
+  parts.forEach(function(p){
+    var d = document.createElement("div");
+    d.style.cssText = "flex:" + Math.max(p.v, tot*0.012) + ";background:" + p.c;
+    d.textContent = p.v/tot > .12 ? p.n : "";
+    d.title = p.n + " = " + fmtN(p.v);
+    s.appendChild(d);
+  });
+  document.getElementById("usageStat").innerHTML =
+    "total input processed: <b>" + fmtN(tot) + "</b> tokens &#183; " +
+    "billed as <b>" + usd(29800*0.5/1e6 + 240*6.25/1e6 + 62*5/1e6) +
+    "</b> on Opus 5, against <b>" + usd(tot*5/1e6) + "</b> uncached";
+})();
+
+})();
+</script>
+</body>
+</html>

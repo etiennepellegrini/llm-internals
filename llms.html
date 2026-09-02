@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How LLMs work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBE7; --card:#F3F6F2; --ink:#16232A; --soft:#4A5A61; --faint:#7C8A8E;
+  --rule:#A9B6B2; --rule-2:#C9D2CE;
+  --q:#1C6A87; --k:#A34E19; --v:#5A4789; --hit:#2C7A57; --warn:#9E2B45;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Spectral,"Iowan Old Style",Georgia,serif;font-size:17px;line-height:1.62}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px 120px}
+a{color:var(--q);text-decoration:none;border-bottom:1px solid var(--rule)}
+a:hover{border-bottom-color:var(--q)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--q);outline-offset:2px}
+.bar{border-bottom:1px solid var(--rule);background:var(--card);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
+.bar .inner{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;gap:18px;flex-wrap:wrap;align-items:baseline}
+.bar a{border:0;color:var(--soft)}
+.bar a[aria-current]{color:var(--ink);font-weight:600}
+.bar a:hover{color:var(--q)}
+.bar .who{margin-left:auto;color:var(--faint)}
+header.title{padding:56px 0 8px}
+header.title h1{font-size:clamp(30px,6.2vw,46px);line-height:1.08;margin:0 0 14px;font-weight:600;letter-spacing:-.015em}
+header.title p.stand{font-size:19px;color:var(--soft);margin:0;max-width:60ch}
+.bannerwrap{container-type:inline-size;margin:64px 0 22px}
+h2 .art{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:clamp(6px,2.24cqw,15px);line-height:1.35;color:var(--rule);white-space:pre;margin:0;font-weight:400}
+h2 .art b{color:var(--ink);font-weight:600}
+h2{margin:0;font-weight:400}
+h3{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-size:14.5px;color:var(--ink);margin:40px 0 10px}
+h3::before{content:"# ===== ";color:var(--rule-2);font-weight:400}
+h4{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;font-weight:600;margin:26px 0 8px}
+h4::before{content:"# --- ";color:var(--rule-2);font-weight:400}
+p{margin:0 0 18px;max-width:66ch}
+ul,ol{max-width:64ch;padding-left:22px}
+li{margin-bottom:9px}
+code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.87em;background:var(--card);padding:1px 5px;border:1px solid var(--rule-2);border-radius:2px}
+pre{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;line-height:1.55;background:var(--card);border:1px solid var(--rule-2);padding:14px 16px;overflow-x:auto}
+pre code{background:none;border:0;padding:0;font-size:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+figure{margin:26px 0;background:var(--card);border:1px solid var(--rule-2);padding:18px}
+figcaption{font-size:14px;color:var(--soft);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule-2);max-width:70ch}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.note{border-left:3px solid var(--rule);padding:2px 0 2px 16px;color:var(--soft);font-size:16px;margin:22px 0}
+.note strong{color:var(--ink)}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;border:1px solid var(--ink);background:var(--ink);color:var(--card);padding:7px 14px;cursor:pointer;border-radius:2px}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+th,td{text-align:left;padding:7px 12px 7px 0;border-bottom:1px solid var(--rule-2);vertical-align:top}
+th{color:var(--soft);font-weight:500}
+svg{max-width:100%;height:auto;display:block}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.readmore{background:var(--card);border:1px solid var(--rule);padding:18px 20px;margin:34px 0}
+.readmore h4{margin-top:0}
+.readmore ul{margin-bottom:0}
+
+/* request replay widget */
+.req{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;border:1px solid var(--rule-2);background:#fff;margin-bottom:10px}
+.req .hd{padding:6px 10px;border-bottom:1px solid var(--rule-2);color:var(--soft);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.req .ln{padding:3px 10px;display:flex;gap:10px}
+.req .ln .who{min-width:66px;color:var(--faint)}
+.req .ln.new{background:rgba(163,78,25,.10)}
+.req .ln.old{color:var(--soft)}
+.legend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--soft);display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.sw{display:inline-block;width:11px;height:11px;vertical-align:-1px;margin-right:5px;border:1px solid var(--rule-2)}
+.tokline{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--soft);margin-top:10px}
+.ctxbar{display:flex;height:34px;border:1px solid var(--rule);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px}
+.ctxbar div{display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<nav class="bar"><div class="inner">
+  <a href="transformers.html">transformers</a>
+  <a href="llms.html" aria-current="page">llms</a>
+  <a href="cache.html">cache</a>
+  <span class="who">3 of 3 &#183; read in any order</span>
+</div></nav>
+
+<div class="wrap">
+
+<header class="title">
+  <h1>How an LLM works</h1>
+  <p class="stand">One level up from the architecture: how a next-token predictor becomes something you can hand a codebase to.</p>
+</header>
+
+<p>The <a href="transformers.html">previous document</a> covered the machine. This one covers everything that turns that machine into an assistant: how it's trained, what it's actually optimising, what happens on each turn of a conversation, and where the model ends and the scaffolding around it begins.</p>
+
+<p>Worth stating up front, because it explains more downstream behaviour than anything else: <strong>a language model is a stateless function.</strong> It has no memory, no session, no internal notepad that persists. Every apparent continuity — a conversation that remembers your name, an agent working through a long task — is produced by replaying the entire history into a fresh call.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Pretraining</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Take an enormous corpus of text. Show the model a passage with a token hidden, ask it to predict that token, measure how wrong it was, and nudge every weight slightly in the direction that would have been less wrong. Repeat something like 10<sup>14</sup> times.</p>
+
+<figure>
+  <div id="trainStage" class="mono" style="font-size:13.5px;line-height:2.05;min-height:132px"></div>
+  <div class="row" style="margin:14px 0 0">
+    <button class="btn" id="trStep">next step</button>
+    <button class="btn ghost" id="trReset">reset</button>
+  </div>
+  <figcaption>One gradient step, schematically. The loss is cross-entropy: the negative log of the probability assigned to the token that actually appeared. Predicting the right token with 0.9 confidence costs 0.11; predicting it with 0.01 confidence costs 4.6. The gradient of that loss with respect to every weight tells you which direction to move.</figcaption>
+</figure>
+
+<p>That objective sounds trivially narrow, and the surprising empirical fact of the last several years is that it isn't. To predict the next token well across a corpus that includes textbooks, source code, arguments, and transcripts, a model has to build internal machinery for grammar, world facts, arithmetic, code semantics, and something that functions like a model of the writer's intent. None of that was asked for directly. It falls out of pressure to compress.</p>
+
+<p>The scale is the other half of the story. Capabilities appear reasonably smoothly as you increase parameters, data and compute together — and some capabilities appear fairly abruptly at particular scales, though there's ongoing argument about how much of that abruptness is real versus an artefact of how it's measured.</p>
+
+<div class="note"><strong>Where the knowledge cutoff comes from.</strong> Pretraining runs on a corpus assembled at a point in time. Everything the model knows without being told, it learned then. It's a snapshot, not a feed — which is why current information has to arrive through the prompt, via search or tools.</div>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Post-training</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>A freshly pretrained model is a document continuer, not an assistant. Ask it a question and a plausible continuation might be three more questions, because that's what a list of questions looks like in the wild. Post-training is what closes that gap.</p>
+
+<figure>
+<svg viewBox="0 0 700 250" role="img" aria-label="Training pipeline from pretraining through supervised fine-tuning and preference training to deployment">
+  <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+    <path d="M0,0 L7,3.2 L0,6.4 z" fill="#4A5A61"/></marker></defs>
+
+  <rect x="8" y="40" width="152" height="86" fill="#fff" stroke="#4A5A61"/>
+  <text x="22" y="64" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#16232A">pretraining</text>
+  <text x="22" y="84" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">next-token prediction</text>
+  <text x="22" y="99" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">on a huge corpus</text>
+  <text x="22" y="118" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#A34E19">months &#183; most of the cost</text>
+
+  <path d="M162,83 L190,83" stroke="#4A5A61" fill="none" marker-end="url(#a2)"/>
+
+  <rect x="196" y="40" width="152" height="86" fill="#fff" stroke="#4A5A61"/>
+  <text x="210" y="64" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#16232A">supervised</text>
+  <text x="210" y="79" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#16232A">fine-tuning</text>
+  <text x="210" y="99" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">curated demonstrations</text>
+  <text x="210" y="114" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">of good responses</text>
+
+  <path d="M350,83 L378,83" stroke="#4A5A61" fill="none" marker-end="url(#a2)"/>
+
+  <rect x="384" y="40" width="160" height="86" fill="#fff" stroke="#4A5A61"/>
+  <text x="398" y="64" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#16232A">preference</text>
+  <text x="398" y="79" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#16232A">training</text>
+  <text x="398" y="99" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">optimise against a</text>
+  <text x="398" y="114" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">learned reward signal</text>
+
+  <path d="M546,83 L574,83" stroke="#4A5A61" fill="none" marker-end="url(#a2)"/>
+
+  <rect x="580" y="40" width="112" height="86" fill="#F3F6F2" stroke="#1C6A87"/>
+  <text x="594" y="64" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#1C6A87">deployment</text>
+  <text x="594" y="84" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">+ system prompt</text>
+  <text x="594" y="99" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">+ tools</text>
+  <text x="594" y="114" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">+ safety filters</text>
+
+  <text x="8" y="168" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">weights frozen after this point &#8212; nothing you type in a conversation changes them</text>
+  <path d="M8,180 L692,180" stroke="#C9D2CE" fill="none"/>
+  <text x="8" y="202" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">the reward signal comes from human comparisons (RLHF), from an AI judge scoring against</text>
+  <text x="8" y="217" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">a written set of principles (Constitutional AI), or in practice from a blend of both</text>
+</svg>
+<figcaption>Post-training is a rounding error on the compute budget and most of what you experience. It's also where a lot of the character comes from — including the failure modes, like a tendency toward agreeableness when the reward signal rewarded responses people liked.</figcaption>
+</figure>
+
+<p>One consequence worth internalising: the model is not optimised for truth. It's optimised for producing text that a rater would judge favourably. Those correlate strongly, because well-informed correct answers are usually the ones people prefer. But where they come apart — a confident wrong answer that reads well versus a hedged correct one — the objective doesn't automatically pick the true one.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">What a turn actually is</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Here is the part that most changes how you'll read your usage numbers. There is no session on the server. Each turn is an independent, self-contained call, and everything the model appears to remember is text you re-sent.</p>
+
+<figure>
+  <div class="legend">
+    <span><span class="sw" style="background:#fff"></span>replayed from earlier turns</span>
+    <span><span class="sw" style="background:rgba(163,78,25,.30)"></span>new this turn</span>
+  </div>
+  <div id="replay"></div>
+  <div class="row" style="margin:14px 0 0">
+    <button class="btn" id="rNext">send next turn</button>
+    <button class="btn ghost" id="rReset">reset</button>
+  </div>
+  <div class="tokline" id="rTok"></div>
+  <figcaption>By turn four the model is re-reading the system prompt, the tool definitions, and every prior message for the fourth time. Nothing about turn one is retained between calls; it is simply present again in the input. The cumulative token count is the thing that shows up on your bill &#8212; and the reason prompt caching exists at all.</figcaption>
+</figure>
+
+<p>So "context window" isn't a memory capacity. It's the maximum size of the document you can hand over in a single call. When a long conversation degrades, nothing was forgotten in the human sense — the transcript either exceeded the window and got truncated, or it got summarised and re-injected by the surrounding application.</p>
+
+<h3>What's in the window on a typical Claude Code call</h3>
+
+<figure>
+  <div class="ctxbar">
+    <div style="flex:14;background:#1C6A87">system + tools</div>
+    <div style="flex:9;background:#5A4789">project instructions</div>
+    <div style="flex:36;background:#A34E19">files read into context</div>
+    <div style="flex:33;background:#2C7A57">conversation + tool results</div>
+    <div style="flex:8;background:#4A5A61">headroom</div>
+  </div>
+  <figcaption>Indicative proportions, not measured. The first three segments are stable across the whole session &#8212; identical bytes, call after call. That stability is exactly what makes them cacheable, and why cache reads dominate the usage breakdown in an agentic session.</figcaption>
+</figure>
+
+<div class="bannerwrap"><h2>
+<span class="sr">The agent loop</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<p>Tool use looks like the model reaching out and doing things. Mechanically it's narrower: the model emits a structured block requesting a call, generation stops, <em>your</em> code executes it, the result is appended to the transcript, and the whole thing is sent back in. The model never touches your filesystem. It writes down what it would like done and waits.</p>
+
+<figure>
+<svg viewBox="0 0 660 300" role="img" aria-label="The agent loop: model emits a tool call, the harness executes it, the result is appended and resent">
+  <defs><marker id="a3" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+    <path d="M0,0 L7,3.2 L0,6.4 z" fill="#4A5A61"/></marker></defs>
+
+  <rect x="40" y="26" width="200" height="62" fill="#fff" stroke="#1C6A87"/>
+  <text x="56" y="50" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#1C6A87">1 &#183; model call</text>
+  <text x="56" y="70" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">full transcript in, tokens out</text>
+
+  <path d="M240,57 L410,57" stroke="#4A5A61" fill="none" marker-end="url(#a3)"/>
+  <rect x="418" y="26" width="204" height="62" fill="#fff" stroke="#4A5A61"/>
+  <text x="434" y="50" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#16232A">2 &#183; tool_use block</text>
+  <text x="434" y="70" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">{"name":"read_file", ...}</text>
+
+  <path d="M520,88 L520,124" stroke="#4A5A61" fill="none" marker-end="url(#a3)"/>
+  <rect x="418" y="132" width="204" height="62" fill="#F3F6F2" stroke="#A34E19"/>
+  <text x="434" y="156" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#A34E19">3 &#183; your harness runs it</text>
+  <text x="434" y="176" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">outside the model entirely</text>
+
+  <path d="M418,163 L248,163" stroke="#4A5A61" fill="none" marker-end="url(#a3)"/>
+  <rect x="40" y="132" width="200" height="62" fill="#fff" stroke="#4A5A61"/>
+  <text x="56" y="156" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#16232A">4 &#183; append result</text>
+  <text x="56" y="176" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">transcript grows</text>
+
+  <path d="M140,132 L140,96" stroke="#4A5A61" fill="none" marker-end="url(#a3)"/>
+  <text x="152" y="116" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">loop until done</text>
+
+  <path d="M40,232 L620,232" stroke="#C9D2CE" fill="none"/>
+  <text x="40" y="256" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">every pass through the loop re-sends everything before it &#8212; a 40-step task means 40 calls</text>
+  <text x="40" y="272" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7C8A8E">over a transcript that only ever grows. this is the single biggest driver of agentic token cost.</text>
+</svg>
+<figcaption>MCP servers, file tools and web search all fit this shape. The protocol differences are about how tools get described and discovered; the loop underneath is the same one.</figcaption>
+</figure>
+
+<p>Two practical corollaries. Because tool results enter as ordinary text, they are <em>data, not instructions</em> — a file that contains "ignore your previous instructions" is a prompt-injection attempt, and the reason a well-built agent treats retrieved content with suspicion. And because each pass re-sends the growing transcript, a long agentic run is dominated by input tokens. Almost all of them identical to last time.</p>
+
+<div class="bannerwrap"><h2>
+<span class="sr">Failure modes and their causes</span>
+<span class="art" aria-hidden="true"></span></h2></div>
+
+<table>
+<thead><tr><th style="width:31%">What you see</th><th>Where it comes from</th></tr></thead>
+<tbody>
+<tr><td>Confident fabrication</td><td>The objective rewards plausible continuations. A well-formed citation that doesn't exist has high probability under the model's distribution because it looks exactly like the citations it was trained on. There is no internal check against ground truth.</td></tr>
+<tr><td>Arithmetic and character-counting errors</td><td>Tokens aren't digits or letters. <code>1024</code> may be one or two tokens with no positional structure. Reliable arithmetic requires either writing out intermediate steps or calling out to a calculator.</td></tr>
+<tr><td>Drifting in long sessions</td><td>Attention is finite and the transcript keeps growing. Instructions from early on compete with thousands of intervening tokens. Restating what matters works better than assuming it persists.</td></tr>
+<tr><td>Excessive agreement</td><td>Preference training on human ratings selects for responses people liked. Where being liked and being right diverge, the pressure is toward being liked. Labs actively correct for this; it's a persistent tension, not a solved one.</td></tr>
+<tr><td>Same prompt, different answer</td><td>Sampling. At temperature 0 the model is deterministic. Anything above that draws from a distribution, and batching effects on the serving side can add a little more nondeterminism.</td></tr>
+<tr><td>Rambling on simple questions</td><td>Compute per token is fixed, so there's no built-in way to spend less effort on an easy question. Length is a learned stylistic behaviour, tunable by instruction.</td></tr>
+</tbody>
+</table>
+
+<h3>What follows for how you use it</h3>
+
+<ul>
+  <li><strong>Put stable content first.</strong> Instructions, tool definitions and reference material at the front of the prompt; the varying part at the end. Better for the model, and required for caching to work.</li>
+  <li><strong>Verification beats persuasion.</strong> The model can't check its own claims against reality. A loop that runs tests and reads real output is worth more than any amount of prompt tuning.</li>
+  <li><strong>Restate rather than assume.</strong> Nothing carries over between calls that isn't in the text you sent.</li>
+  <li><strong>Fresh context is a real tool.</strong> When a session has accumulated failed attempts and dead ends, starting over with a clean spec often outperforms trying to correct course in place.</li>
+</ul>
+
+<div class="note"><strong>Next.</strong> Everything above says the same input gets re-sent constantly. The <a href="cache.html">third document</a> is about what the serving infrastructure does with that fact, and why your usage breakdown is mostly cache reads.</div>
+
+<div class="readmore">
+<h4>worth reading</h4>
+<ul>
+  <li><a href="https://karpathy.ai/zero-to-hero.html">Karpathy, Neural Networks: Zero to Hero</a> &#8212; builds a GPT from nothing in a few hours of video. The single best investment if you want this to stop feeling like magic.</li>
+  <li><a href="https://transformer-circuits.pub/">Transformer Circuits</a> &#8212; Anthropic's interpretability work: what individual features and circuits inside these models actually compute.</li>
+  <li><a href="https://www.anthropic.com/news/claudes-constitution">Claude's constitution</a> &#8212; the written principles used in preference training, published in full.</li>
+  <li><a href="https://arxiv.org/abs/2001.08361">Scaling Laws for Neural Language Models</a> &#8212; the empirical relationship between compute, data, parameters and loss.</li>
+</ul>
+</div>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var W = 70;
+document.querySelectorAll("h2").forEach(function(h2){
+  var t = h2.querySelector(".sr").textContent.toUpperCase();
+  var pad = Math.max(0, Math.floor((W - t.length)/2));
+  var rule = new Array(W+1).join("=");
+  h2.querySelector(".art").innerHTML =
+    "# " + rule + "\n#\n# " + new Array(pad+1).join(" ") + "<b>" + t + "</b>\n#\n# " + rule;
+});
+
+/* ==================================================================== */
+/* one gradient step, schematically                                      */
+/* ==================================================================== */
+var TR = [
+ '<span style="color:#7C8A8E">corpus sample</span>  The spacecraft entered orbit around <span style="background:#C9D2CE">&#9608;&#9608;&#9608;&#9608;&#9608;</span>',
+ '<span style="color:#7C8A8E">model predicts</span> Jupiter 0.31 &#183; Saturn 0.22 &#183; Earth 0.14 &#183; the 0.09 &#183; \u2026',
+ '<span style="color:#7C8A8E">actual token</span>   <span style="color:#A34E19">Saturn</span>   \u2014 assigned p = 0.22',
+ '<span style="color:#7C8A8E">loss</span>           \u2212ln(0.22) = <span style="color:#A34E19">1.51</span>',
+ '<span style="color:#7C8A8E">update</span>         nudge every weight down the gradient of that loss',
+ '<span style="color:#7C8A8E">repeat</span>         \u00d7 10<sup>14</sup>'
+];
+var trI = 0, trHost = document.getElementById("trainStage");
+function trDraw(){
+  trHost.innerHTML = TR.slice(0, trI).map(function(l){ return "<div>"+l+"</div>"; }).join("");
+  document.getElementById("trStep").disabled = trI >= TR.length;
+}
+document.getElementById("trStep").addEventListener("click", function(){ if(trI<TR.length){trI++; trDraw();} });
+document.getElementById("trReset").addEventListener("click", function(){ trI=0; trDraw(); });
+trI = 1; trDraw();
+
+/* ==================================================================== */
+/* stateless replay                                                      */
+/* ==================================================================== */
+var TURNS = [
+  [["system","You are a coding assistant. Tools: read_file, edit, bash \u2026", 2400],
+   ["user","Why is the build failing on RHEL?", 12]],
+  [["assistant","Let me look at the CMake config.", 60],
+   ["tool","read_file(CMakeLists.txt) \u2192 210 lines", 1800],
+   ["user","Yes, and check the toolchain file too.", 14]],
+  [["assistant","Found it \u2014 the Fortran flags differ.", 80],
+   ["tool","read_file(toolchain-rhel.cmake) \u2192 64 lines", 620],
+   ["user","Can you patch it?", 9]],
+  [["assistant","Here's the change to line 41.", 140],
+   ["tool","edit(toolchain-rhel.cmake) \u2192 ok", 90],
+   ["user","Now re-run the build.", 11]]
+];
+var shown = 1;
+var rHost = document.getElementById("replay"),
+    rTok  = document.getElementById("rTok");
+
+function rDraw(){
+  rHost.innerHTML = "";
+  var running = 0, fresh = 0;
+  var box = document.createElement("div");
+  box.className = "req";
+  var replayed = 0;
+  for (var t=0; t<shown; t++){
+    TURNS[t].forEach(function(ln){
+      var isNew = (t === shown-1);
+      var d = document.createElement("div");
+      d.className = "ln " + (isNew ? "new" : "old");
+      d.innerHTML = '<span class="who">' + ln[0] + '</span><span>' + ln[1] + '</span>';
+      box.appendChild(d);
+      running += ln[2];
+      if (isNew) fresh += ln[2]; else replayed += ln[2];
+    });
+  }
+  var hd = document.createElement("div");
+  hd.className = "hd";
+  hd.innerHTML = "<span>request " + shown + " &#183; POST /v1/messages</span><span>" +
+                 running.toLocaleString() + " input tokens</span>";
+  box.insertBefore(hd, box.firstChild);
+  rHost.appendChild(box);
+
+  var cum = 0;
+  for (var i=0;i<shown;i++){
+    for (var j=0;j<=i;j++) TURNS[j].forEach(function(l){ cum += l[2]; });
+  }
+  rTok.innerHTML = "replayed this call: <b>" + replayed.toLocaleString() +
+    "</b> &#183; new this call: <b>" + fresh.toLocaleString() +
+    "</b> &#183; cumulative input tokens billed across all " + shown +
+    " call" + (shown>1?"s":"") + ": <b>" + cum.toLocaleString() + "</b>";
+  document.getElementById("rNext").disabled = shown >= TURNS.length;
+}
+document.getElementById("rNext").addEventListener("click", function(){ if(shown<TURNS.length){shown++; rDraw();} });
+document.getElementById("rReset").addEventListener("click", function(){ shown=1; rDraw(); });
+rDraw();
+
+})();
+</script>
+</body>
+</html>
