@@ -93,7 +93,7 @@ correct token given p = 0.01   &#8594;   loss = &#8722;ln(0.01) = 4.61</code></p
 
 <div class="note"><strong>Where the knowledge cutoff comes from.</strong> The corpus is assembled at a moment in time. Everything the model knows unprompted, it learned then. It's a snapshot, not a feed &#8212; which is why anything current has to arrive through the prompt, via search or tools.</div>
 
-<div class="bannerwrap"><h2>
+<div class="bannerwrap" id="post-training"><h2>
 <span class="sr">Post-training</span>
 <span class="art" aria-hidden="true"></span></h2></div>
 
@@ -156,7 +156,7 @@ correct token given p = 0.01   &#8594;   loss = &#8722;ln(0.01) = 4.61</code></p
 
 <p>One consequence worth internalising: <strong>the model is not optimised for truth.</strong> It's optimised for text a rater would judge favourably. Those correlate strongly, since correct well-informed answers are usually preferred. But where they diverge — a confident wrong answer that reads beautifully versus a hedged correct one — nothing in the objective automatically picks the true one.</p>
 
-<div class="bannerwrap"><h2>
+<div class="bannerwrap" id="turns"><h2>
 <span class="sr">What a conversational turn actually is</span>
 <span class="art" aria-hidden="true"></span></h2></div>
 

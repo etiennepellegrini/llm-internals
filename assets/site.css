@@ -74,17 +74,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{
 /* every block-level child of the column fills it exactly */
 .wrap > *{max-width:100%}
 
-@media(min-width:1024px){
-  .shell{
-    display:flex; gap:52px; justify-content:center;
-    align-items:flex-start; padding:0 24px;
-  }
-  .side{display:block;flex:0 0 var(--side-w);position:sticky;top:0;
-        max-height:100vh;overflow-y:auto;padding:56px 0 40px}
-  .wrap{flex:0 1 var(--measure)}
-  .bar{display:none}
-}
-
 
 /* ======================================================================
    Navigation — top bar on narrow screens, sidebar on wide
@@ -110,6 +99,21 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{
 .side .lab{font-family:var(--mono);font-size:11px;color:var(--faint);margin-bottom:9px}
 .side .toc a{font-size:11.5px;padding:4px 0 4px 12px}
 .side .toc a.on{color:var(--q);border-left-color:var(--q)}
+
+/* Wide screens: sidebar in, top bar out.
+   This block MUST stay after every base .side / .bar rule above — media
+   queries carry no extra specificity, so an equal-specificity rule later
+   in the file would silently win and hide the sidebar at all widths. */
+@media(min-width:1024px){
+  .shell{
+    display:flex; gap:52px; justify-content:center;
+    align-items:flex-start; padding:0 24px;
+  }
+  .side{display:block;flex:0 0 var(--side-w);position:sticky;top:0;
+        max-height:100vh;overflow-y:auto;padding:56px 0 40px}
+  .wrap{flex:0 1 var(--measure)}
+  .bar{display:none}
+}
 
 
 /* ======================================================================
